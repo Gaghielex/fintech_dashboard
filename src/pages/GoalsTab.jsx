@@ -57,7 +57,7 @@ export function GoalsTab({
   )
 
   return (
-    <div className="flex min-h-[calc(100dvh-6rem)] flex-col space-y-5 pb-6">
+    <div className="flex min-h-[calc(100dvh-6rem)] flex-col space-y-5 pb-6 pt-2">
       <header>
         <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
           Goals
