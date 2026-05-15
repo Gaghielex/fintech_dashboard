@@ -110,7 +110,7 @@ export function SideNav() {
         <span className="font-syne flex h-8 w-8 items-center justify-center rounded-full border-2 border-canvas bg-surface-1 text-xs font-bold text-primary">
           G
         </span>
-        <span className="font-syne -ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-surface text-xs font-bold text-accent-gold">
+        <span className="font-syne -ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-surface text-xs font-bold text-accent-pink">
           A
         </span>
         <span className="font-dm-sans ml-1 text-xs text-ink-muted">Household</span>

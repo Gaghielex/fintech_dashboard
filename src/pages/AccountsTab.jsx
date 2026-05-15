@@ -106,7 +106,7 @@ function OwnerInitial({ owner }) {
     owner === 'gabriel'
       ? 'bg-primary/15 text-primary'
       : owner === 'ana'
-        ? 'bg-accent-gold/15 text-accent-gold'
+        ? 'bg-accent-pink/15 text-accent-pink'
         : 'bg-surface-1 text-ink-muted'
   return (
     <span

@@ -12,6 +12,7 @@
   --palette-border: #30363d;
   --palette-primary: #00c896;
   --palette-accent-gold: #f0c419;
+  --palette-accent-pink: #f72585;
   --palette-text-primary: #e6edf3;
   --palette-text-secondary: #8b949e;
   --palette-text-tertiary: #484f58;
@@ -33,6 +34,7 @@
   --color-border: var(--palette-border);
   --color-primary: var(--palette-primary);
   --color-accent-gold: var(--palette-accent-gold);
+  --color-accent-pink: var(--palette-accent-pink);
   /* PRD text tiers → utilities text-ink, text-ink-muted, text-ink-faint */
   --color-ink: var(--palette-text-primary);
   --color-ink-muted: var(--palette-text-secondary);

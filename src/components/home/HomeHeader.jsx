@@ -20,7 +20,7 @@ export function HomeHeader() {
         <span className="font-syne -mr-2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-canvas bg-surface-1 text-sm font-bold text-primary">
           G
         </span>
-        <span className="font-syne flex h-10 w-10 items-center justify-center rounded-full border-2 border-canvas bg-surface text-sm font-bold text-accent-gold">
+        <span className="font-syne flex h-10 w-10 items-center justify-center rounded-full border-2 border-canvas bg-surface text-sm font-bold text-accent-pink">
           A
         </span>
       </div>
