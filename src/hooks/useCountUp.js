@@ -16,8 +16,10 @@ export function useCountUp(target, enabled, duration = 1.2) {
 
   useEffect(() => {
     if (!enabled) {
-      setValue(0)
       fromRef.current = 0
+      queueMicrotask(() => {
+        setValue(0)
+      })
       return
     }
     const from = fromRef.current

@@ -90,14 +90,15 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
         </p>
       </header>
 
-      {fx.error && !ratesReady ? (
+      {!ratesReady && !fx.loading ? (
         <p className="font-dm-sans rounded-lg border border-warning/50 bg-warning/10 px-3 py-2 text-sm text-warning">
-          {fx.error}
+          {fx.error ||
+            'FX rates unavailable. Converter inputs stay disabled until rates load.'}
         </p>
       ) : null}
 
       {fx.fromCache && ratesReady ? (
-        <p className="font-dm-sans text-xs text-ink-muted">
+        <p className="font-dm-sans rounded-lg border border-warning/40 bg-warning/5 px-3 py-2 text-xs text-warning">
           Showing last known FX bundle (Frankfurter unavailable on last fetch).
         </p>
       ) : null}

@@ -7,6 +7,7 @@ import { HomeHeroSection } from '../components/home/HomeHeroSection.jsx'
 import { GeographySection } from '../components/home/GeographySection.jsx'
 import { OwnershipSection } from '../components/home/OwnershipSection.jsx'
 import { FreshnessBar } from '../components/home/FreshnessBar.jsx'
+import { AddToHomeScreenBanner } from '../components/home/AddToHomeScreenBanner.jsx'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 18 },
@@ -23,7 +24,8 @@ const fadeUp = {
  *   settings: import('../types/sheetTypes.js').SettingsRow | null,
  *   latestRates: { JPY: number, USD: number } | null,
  *   fxDateLabel: string | null,
- *   sheetLoading: boolean,
+ *   fxFromCache: boolean,
+ *   fxRatesCachedAt: string | null,
  * }} props
  */
 export function HomeTab({
@@ -31,7 +33,8 @@ export function HomeTab({
   settings,
   latestRates,
   fxDateLabel,
-  sheetLoading,
+  fxFromCache,
+  fxRatesCachedAt,
 }) {
   const metrics = useMemo(
     () => computeHomeMetrics(accounts, settings, latestRates),
@@ -50,9 +53,9 @@ export function HomeTab({
         <IllustrationPlaceholder />
       </motion.div>
 
-      {sheetLoading ? (
-        <p className="font-dm-mono mb-6 text-sm text-ink-muted">
-          Loading sheet…
+      {!accounts.length ? (
+        <p className="font-dm-sans mb-4 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink-muted">
+          No account rows in the sheet yet. Balances below stay at zero until you add data.
         </p>
       ) : null}
 
@@ -84,7 +87,24 @@ export function HomeTab({
         />
       </motion.div>
 
-      <motion.div custom={4} variants={fadeUp} initial="hidden" animate="visible">
+      <motion.div custom={4} variants={fadeUp} initial="hidden" animate="visible" className="mt-auto space-y-4">
+        {fxFromCache && ratesReady && fxRatesCachedAt ? (
+          <p className="font-dm-sans rounded-lg border border-warning/50 bg-warning/10 px-3 py-2 text-sm text-warning">
+            Rates as of{' '}
+            {new Date(fxRatesCachedAt).toLocaleString('en-AU', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+            {' — '}
+            could not refresh. Converted amounts may be stale.
+          </p>
+        ) : null}
+
+        <AddToHomeScreenBanner />
+
         <FreshnessBar
           globalLastUpdated={metrics.globalLastUpdated}
           staleThresholdDays={metrics.staleThresholdDays}

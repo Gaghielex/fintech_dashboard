@@ -12,7 +12,6 @@ import { GoalCard } from '../components/goals/GoalCard.jsx'
  *   latestRates: { JPY: number, USD: number } | null,
  *   spreadsheetId: string | undefined,
  *   sheetGids: Record<string, number> | undefined,
- *   loading: boolean,
  * }} props
  */
 export function GoalsTab({
@@ -22,7 +21,6 @@ export function GoalsTab({
   latestRates,
   spreadsheetId,
   sheetGids,
-  loading,
 }) {
   const metrics = useMemo(
     () => computeHomeMetrics(accounts, settings, latestRates),
@@ -74,10 +72,6 @@ export function GoalsTab({
           </button>
         </div>
       )}
-
-      {loading ? (
-        <p className="font-dm-mono text-sm text-ink-muted">Loading sheet…</p>
-      ) : null}
 
       <GoalsLiquidStrip
         liquidAud={metrics.liquidAud}

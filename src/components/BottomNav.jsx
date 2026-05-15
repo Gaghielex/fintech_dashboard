@@ -103,7 +103,7 @@ export function BottomNav() {
               key={id}
               type="button"
               onClick={onActivate}
-              className="flex min-w-[4.25rem] flex-1 flex-col items-center gap-1 rounded-lg py-1.5 font-dm-sans text-[10px] font-medium text-ink-muted outline-none ring-primary/30 focus-visible:ring-2"
+              className="flex min-w-[4.25rem] flex-1 flex-col items-center gap-1 rounded-lg py-1.5 font-dm-sans text-[13px] font-medium leading-none text-ink-muted outline-none ring-primary/30 focus-visible:ring-2"
               aria-current={active ? 'page' : undefined}
             >
               <span

@@ -1,4 +1,4 @@
-import { formatMoney } from '../../utils/formatCurrency.js'
+import { formatMoney, formatMoneyParts } from '../../utils/formatCurrency.js'
 import { useCountUp } from '../../hooks/useCountUp.js'
 
 /**
@@ -26,12 +26,29 @@ export function HomeHeroSection({
           Household net worth
         </p>
         <p
-          className="font-syne mt-1 text-[clamp(2.25rem,8vw,3rem)] font-extrabold leading-none tracking-tight text-primary"
+          className="font-syne mt-1 flex flex-wrap items-baseline gap-x-1 text-[clamp(2.25rem,8vw,3rem)] font-extrabold leading-none tracking-tight text-primary"
           aria-live="polite"
         >
-          {ratesReady
-            ? formatMoney(displayNetWorth, 'AUD', { maxFractionDigits: 0 })
-            : '—'}
+          {ratesReady ? (
+            formatMoneyParts(displayNetWorth, 'AUD', {
+              maxFractionDigits: 0,
+            }).map((part, i) =>
+              part.type === 'currency' ? (
+                <span
+                  key={`p-${i}`}
+                  className="font-dm-sans text-[0.42em] font-medium tracking-normal text-primary/50"
+                >
+                  {part.value}
+                </span>
+              ) : (
+                <span key={`p-${i}`} className="font-extrabold">
+                  {part.value}
+                </span>
+              ),
+            )
+          ) : (
+            '—'
+          )}
         </p>
         {!ratesReady ? (
           <p className="font-dm-mono mt-2 text-xs text-warning">

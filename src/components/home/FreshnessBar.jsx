@@ -40,7 +40,9 @@ export function FreshnessBar({
           stale ? 'text-warning' : 'text-ink-muted'
         }`}
       >
-        <span className="font-dm-sans font-semibold text-ink">
+        <span
+          className={`font-dm-sans font-semibold ${stale ? 'text-warning' : 'text-ink'}`}
+        >
           Data freshness
         </span>
         <br />

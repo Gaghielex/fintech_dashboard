@@ -149,7 +149,8 @@ function AccountRow({ account, rates, staleThresholdDays }) {
   const audAmt = toAud(account, rates)
   const showNativeAud = account.currency !== 'AUD' && rates?.JPY > 0 && rates?.USD > 0
   const showRate =
-    (t === 'savings' || t === 'term_deposit') && account.interest_rate != null
+    (t === 'savings' || t === 'term_deposit' || t === 'super') &&
+    account.interest_rate != null
   const hasDetail =
     showRate || account.maturity_date || account.last_updated || account.notes
 
@@ -160,7 +161,7 @@ function AccountRow({ account, rates, staleThresholdDays }) {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-1/50"
+        className="flex min-h-[44px] w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-1/50"
         aria-expanded={open}
       >
         <div className="min-w-0 flex-1">
@@ -182,7 +183,7 @@ function AccountRow({ account, rates, staleThresholdDays }) {
               </span>
             )}
           </div>
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+          <div className="pointer-events-none mt-1.5 flex flex-wrap items-center gap-1.5">
             <TypeBadge type={t} />
             <StatusBadge status={st} />
             <OwnerInitial owner={owner} />
@@ -355,9 +356,17 @@ function AccountSection({
  *   error: string | null,
  *   latestRates: { JPY: number, USD: number } | null,
  *   settings: import('../types/sheetTypes.js').SettingsRow | null,
+ *   onRetryLoad?: () => void,
  * }} props
  */
-export function AccountsTab({ accounts = [], loading, error, latestRates, settings }) {
+export function AccountsTab({
+  accounts = [],
+  loading,
+  error,
+  latestRates,
+  settings,
+  onRetryLoad,
+}) {
   const { accountsEntry } = useNavigation()
   const rates = useMemo(
     () => latestRates ?? { JPY: 0, USD: 0 },
@@ -511,6 +520,38 @@ export function AccountsTab({ accounts = [], loading, error, latestRates, settin
     return []
   }, [filteredAccounts, groupMode, rates])
 
+  const isEmptyAccountSheet = !loading && !error && accounts.length === 0
+
+  if (isEmptyAccountSheet) {
+    return (
+      <div className="space-y-4 pb-6">
+        <header>
+          <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
+            Accounts
+          </h1>
+          <p className="font-dm-sans mt-1 text-sm text-ink-muted">No data loaded yet.</p>
+        </header>
+        <div className="rounded-xl border border-dashed border-border bg-surface/60 px-4 py-8 text-center">
+          <p className="font-dm-sans text-sm text-ink-muted">
+            No account rows were returned from Google Sheets.
+          </p>
+          <p className="font-dm-sans mt-2 text-xs text-ink-faint">
+            Add accounts on the Accounts tab in your spreadsheet, then save.
+          </p>
+          {onRetryLoad ? (
+            <button
+              type="button"
+              onClick={onRetryLoad}
+              className="font-dm-sans mt-4 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-canvas transition hover:opacity-90"
+            >
+              Try again
+            </button>
+          ) : null}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-4 pb-6">
       <header>
@@ -535,9 +576,18 @@ export function AccountsTab({ accounts = [], loading, error, latestRates, settin
       </header>
 
       {error && (
-        <p className="font-dm-sans rounded-lg border border-negative/40 bg-negative/10 px-3 py-2 text-sm text-negative">
-          {error}
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-negative/40 bg-negative/10 px-3 py-2">
+          <p className="font-dm-sans min-w-0 flex-1 text-sm text-negative">{error}</p>
+          {onRetryLoad ? (
+            <button
+              type="button"
+              onClick={onRetryLoad}
+              className="font-dm-sans shrink-0 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-medium text-ink transition hover:bg-surface-1"
+            >
+              Try again
+            </button>
+          ) : null}
+        </div>
       )}
 
       {!accountsEntry.retirementOnly && (

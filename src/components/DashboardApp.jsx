@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { NavigationProvider } from '../context/NavigationProvider.jsx'
 import { useNavigation } from '../context/useNavigation.js'
 import { AppShell } from './AppShell.jsx'
+import { SheetLoadError } from './SheetLoadError.jsx'
+import { TabContentSkeleton } from './skeletons/TabContentSkeleton.jsx'
 import { useSheetData } from '../hooks/useSheetData.js'
 import { useFXRates } from '../hooks/useFXRates.js'
 import { HomeTab } from '../pages/HomeTab.jsx'
@@ -16,6 +18,9 @@ function DashboardBody({ sheet, fx }) {
   const settings = sheet.data?.settings ?? null
   const latestRates = fx.latest?.rates ?? null
 
+  const blockingSheetError = Boolean(sheet.error && !sheet.data)
+  const sheetInitialLoad = Boolean(sheet.loading && !sheet.data)
+
   const fxDateLabel = useMemo(() => {
     if (!fx.latest) return null
     const { date, rates } = fx.latest
@@ -24,21 +29,29 @@ function DashboardBody({ sheet, fx }) {
     return `1 AUD = ${j} JPY · ${u} USD · ${date}${fx.fromCache ? ' · cached rates' : ''}`
   }, [fx.latest, fx.fromCache])
 
+  if (blockingSheetError) {
+    return (
+      <SheetLoadError
+        message={sheet.error ?? 'Unknown error'}
+        onRetry={sheet.refetch}
+      />
+    )
+  }
+
+  if (sheetInitialLoad) {
+    return <TabContentSkeleton tab={tab} />
+  }
+
   return (
     <>
-      {sheet.error ? (
-        <div className="mb-4 rounded-lg border border-negative/40 bg-negative/10 px-3 py-2 font-dm-sans text-sm text-negative">
-          {sheet.error}
-        </div>
-      ) : null}
-
       {tab === 'home' ? (
         <HomeTab
           accounts={accounts}
           settings={settings}
           latestRates={latestRates}
           fxDateLabel={fxDateLabel}
-          sheetLoading={sheet.loading}
+          fxFromCache={fx.fromCache}
+          fxRatesCachedAt={fx.lastFetchAt}
         />
       ) : null}
 
@@ -49,6 +62,7 @@ function DashboardBody({ sheet, fx }) {
           error={sheet.error}
           latestRates={latestRates}
           settings={settings}
+          onRetryLoad={sheet.refetch}
         />
       ) : null}
 
@@ -60,7 +74,6 @@ function DashboardBody({ sheet, fx }) {
           latestRates={latestRates}
           spreadsheetId={import.meta.env.VITE_SHEET_ID}
           sheetGids={sheet.data?.sheetGids}
-          loading={sheet.loading}
         />
       ) : null}
       {tab === 'convert' ? (
