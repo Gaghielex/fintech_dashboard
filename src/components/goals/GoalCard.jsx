@@ -27,14 +27,20 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
       })
     : '—'
 
-  const surplusLabel =
-    m.surplusVsSchedule >= 0 ? 'Surplus vs schedule' : 'Shortfall vs schedule'
-  const surplusAbs = Math.abs(m.surplusVsSchedule)
-
   const chipDays =
     m.daysRemaining === null
       ? '—'
       : `${m.daysRemaining} day${m.daysRemaining === 1 ? '' : 's'} left`
+
+  // P2-08: shorten label
+  const surplusLabel = m.surplusVsSchedule >= 0 ? 'Surplus' : 'Shortfall'
+  const surplusAbs = Math.abs(m.surplusVsSchedule)
+
+  // P2-03: only render threshold tick when it falls in a visible range (5%–95%)
+  const showThresholdTick =
+    ratesReady && m.validWindow && m.thresholdPct >= 5 && m.thresholdPct <= 95
+  const wellAhead =
+    ratesReady && m.validWindow && m.thresholdPct < 5 && m.progressPct >= 5
 
   return (
     <article
@@ -57,10 +63,6 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
         </p>
       </header>
 
-      <p className="font-dm-mono mt-3 text-xs text-ink-muted">
-        Due <span className="text-ink">{dueLabel}</span>
-      </p>
-
       <div className="mt-4">
         <div className="flex items-center justify-between gap-2">
           <span className="font-dm-sans text-xs font-medium text-ink-muted">
@@ -75,7 +77,7 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
             className={`h-full rounded-full ${fillClass}`}
             style={{ width: `${ratesReady ? m.progressPct : 0}%` }}
           />
-          {ratesReady && m.validWindow ? (
+          {showThresholdTick ? (
             <div
               className="pointer-events-none absolute top-0 z-10 h-full w-0.5 bg-warning shadow-[0_0_0_1px_rgba(13,17,23,0.9)]"
               style={{ left: `calc(${m.thresholdPct}% - 1px)` }}
@@ -83,7 +85,11 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
             />
           ) : null}
         </div>
-        {ratesReady && m.validWindow ? (
+        {wellAhead ? (
+          <p className="font-dm-mono mt-1.5 text-[11px] leading-snug text-primary">
+            Well ahead of schedule
+          </p>
+        ) : ratesReady && m.validWindow ? (
           <p className="font-dm-mono mt-1.5 text-[11px] leading-snug text-ink-muted">
             Need{' '}
             <span className="font-medium text-ink">
@@ -117,6 +123,7 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
         </div>
       </div>
 
+      {/* P2-04: chips — surplus/shortfall · days remaining · due date */}
       <div className="mt-4 flex flex-wrap gap-2">
         <StatChip
           label={surplusLabel}
@@ -124,6 +131,7 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
           variant={m.surplusVsSchedule >= 0 ? 'positive' : 'negative'}
         />
         <StatChip label="Days remaining" value={chipDays} variant="neutral" />
+        <StatChip label="Due date" value={dueLabel} variant="neutral" />
       </div>
     </article>
   )

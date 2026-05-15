@@ -47,7 +47,7 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
         hour: '2-digit',
         minute: '2-digit',
       })
-      return fx.fromCache ? `Cached · saved ${t}` : `Live · ${t}`
+      return fx.fromCache ? `Cached · saved ${t}` : `Updated ${t}`
     }
     if (fx.ratesAsOf) return `Ref ${fx.ratesAsOf}`
     return '—'
@@ -142,7 +142,7 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
       <button
         type="button"
         onClick={() => fx.refetch()}
-        className="font-dm-sans self-start rounded-lg border border-border px-3 py-2 text-xs font-medium text-ink hover:bg-surface-1"
+        className="font-dm-sans self-start rounded-lg border border-border bg-surface-1 px-3 py-2 text-xs font-medium text-ink transition hover:bg-surface-1/70"
       >
         Refresh FX
       </button>

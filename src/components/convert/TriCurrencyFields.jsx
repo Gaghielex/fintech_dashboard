@@ -17,7 +17,7 @@ function formatForActive(amounts, active) {
     return String(r)
   }
   if (amounts.aud === 0) return ''
-  const r = Math.round(amounts.aud * 100) / 100
+  const r = Math.round(amounts.aud * 10000) / 10000
   return String(r)
 }
 
@@ -64,7 +64,7 @@ export function TriCurrencyFields({
         ratesReady={ratesReady}
         isEditor={active === 'AUD'}
         local={local}
-        display={formatMoney(amounts.aud, 'AUD')}
+        display={formatMoney(amounts.aud, 'AUD', { maxFractionDigits: 4 })}
         activeKey={active}
         onBlur={() => applyParsed(local)}
         onChange={(e) => {

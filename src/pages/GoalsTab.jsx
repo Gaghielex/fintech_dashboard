@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { computeHomeMetrics } from '../utils/financeAggregate.js'
 import { getGoalsSheetEditUrl } from '../utils/goalsSheetUrl.js'
 import { GoalsLiquidStrip } from '../components/goals/GoalsLiquidStrip.jsx'
@@ -33,6 +33,14 @@ export function GoalsTab({
     latestRates && latestRates.JPY > 0 && latestRates.USD > 0,
   )
 
+  const [bannerDismissed, setBannerDismissed] = useState(
+    () => localStorage.getItem('goals_readonly_dismissed') === 'true',
+  )
+  const dismissBanner = () => {
+    localStorage.setItem('goals_readonly_dismissed', 'true')
+    setBannerDismissed(true)
+  }
+
   const goalsUrl = useMemo(
     () =>
       spreadsheetId
@@ -47,10 +55,25 @@ export function GoalsTab({
         <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
           Goals
         </h1>
-        <p className="font-dm-sans mt-1 text-sm text-ink-muted">
-          Read-only view — edit amounts and dates in Google Sheets.
-        </p>
       </header>
+
+      {!bannerDismissed && (
+        <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+          <p className="font-dm-sans text-sm text-ink-muted">
+            Read-only view — edit amounts and dates in Google Sheets.
+          </p>
+          <button
+            type="button"
+            onClick={dismissBanner}
+            aria-label="Dismiss"
+            className="mt-0.5 shrink-0 text-ink-faint transition hover:text-ink"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {loading ? (
         <p className="font-dm-mono text-sm text-ink-muted">Loading sheet…</p>

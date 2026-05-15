@@ -60,6 +60,23 @@ function daysAgo(iso) {
   return Math.floor((Date.now() - d.getTime()) / 86_400_000)
 }
 
+/**
+ * Strip the bank name prefix from the account name to avoid repetition.
+ * "CommBank" + "CommBank Savings" → "Savings"
+ * "CommBank" + "CommBank" → null (fully duplicate, hide it)
+ */
+function stripBankPrefix(bank, accountName) {
+  if (!accountName || !bank) return accountName || null
+  const prefix = bank.trim()
+  const name = accountName.trim()
+  if (name.toLowerCase() === prefix.toLowerCase()) return null
+  if (name.toLowerCase().startsWith(prefix.toLowerCase())) {
+    const rest = name.slice(prefix.length).replace(/^[\s\-–—:]+/, '')
+    return rest || null
+  }
+  return name
+}
+
 function fmtDate(iso) {
   if (!iso) return null
   const d = new Date(iso)
@@ -151,11 +168,14 @@ function AccountRow({ account, rates, staleThresholdDays }) {
             <span className="font-dm-sans text-sm font-medium text-ink">
               {account.bank}
             </span>
-            {account.account_name && account.account_name !== account.bank && (
-              <span className="font-dm-sans truncate text-sm text-ink-muted">
-                {account.account_name}
-              </span>
-            )}
+            {(() => {
+              const label = stripBankPrefix(account.bank, account.account_name)
+              return label ? (
+                <span className="font-dm-sans truncate text-sm text-ink-muted">
+                  {label}
+                </span>
+              ) : null
+            })()}
             {isStale && (
               <span className="font-dm-mono animate-pulse shrink-0 text-[10px] text-warning">
                 🕐 {days}d ago
