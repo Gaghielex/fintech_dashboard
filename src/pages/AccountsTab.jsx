@@ -7,8 +7,8 @@ const countryLabel = {
 }
 
 const ownerLabel = {
-  gabriel: 'Gabriel',
-  ana: 'Ana',
+  rodrigo: 'Rodrigo',
+  nat: 'Nat',
   joint: 'Joint',
 }
 

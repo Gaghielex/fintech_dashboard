@@ -44,7 +44,7 @@ A Progressive Web App (PWA) hosted on GitHub Pages, backed by a Google Sheet as 
 18. As a user, I want the tap-to-cycle currency state to be per-tile, not global, so that each tile maintains its own display independently.
 19. As a user, I want a Retirement tile in the geography grid, visually distinct from cash account tiles, so that super is visible but clearly categorised as illiquid.
 20. As a user, I want geography tiles to be tappable and navigate to the Accounts tab pre-filtered to that country, so that I can drill into detail naturally.
-21. As a user, I want to see an ownership split section below the geography grid showing Rodrigo, Nat, and Joint totals in AUD, so that individual financial positions are transparent.
+21. As a user, I want to see an ownership split section below the geography grid showing Gabriel, Nat, and Joint totals in AUD, so that individual financial positions are transparent.
 22. As a user, I want joint account balances counted in full for both individuals (not split 50/50), so that our shared money is represented accurately for each person.
 23. As a user, I want tapping an ownership tile to navigate to the Accounts tab pre-filtered to that person, so that the drill-down is consistent with the geography interaction.
 24. As a user, I want to see a data freshness bar at the bottom of the home screen showing when balances were last updated, so that I never mistake the dashboard for live bank data.
@@ -54,7 +54,7 @@ A Progressive Web App (PWA) hosted on GitHub Pages, backed by a Google Sheet as 
 26. As a user, I want the Accounts tab to open in a default state grouped by country when accessed directly, so that geography remains the primary mental model.
 27. As a user, I want the Accounts tab to open pre-filtered to a specific country when tapped from a geography tile, with other countries collapsed, so that the drill-down is seamless.
 28. As a user, I want the Accounts tab to open pre-filtered to a specific person when tapped from an ownership tile, so that the person view is equally accessible.
-29. As a user, I want a filter bar at the top of the Accounts tab with options for All, Rodrigo, Nat, and Joint, so that I can switch ownership views without returning to the home screen.
+29. As a user, I want a filter bar at the top of the Accounts tab with options for All, Gabriel, Nat, and Joint, so that I can switch ownership views without returning to the home screen.
 30. As a user, I want a group toggle (By Country / By Type / By Person) so that I can reorganise the account list based on what I need to understand.
 31. As a user, I want country section headers to show the country name, flag, total balance in native currency, AUD equivalent, and account count, so that I have a summary without expanding.
 32. As a user, I want country sections to be collapsible, with collapse state driven by entry point, so that I see only what is relevant to the context I came from.
@@ -185,7 +185,7 @@ Negative:       #E24B4A
 | inactive | no | no | yes (with flag) |
 
 ### Joint Account Counting
-- Joint accounts counted in full for both Rodrigo and Nat in the ownership split
+- Joint accounts counted in full for both Gabriel and Ana in the ownership split
 - Not split 50/50
 - Displayed as a separate "Joint" tile in addition to individual totals
 
@@ -216,7 +216,7 @@ Negative:       #E24B4A
 | country | enum | `AU` / `JP` / `EC` |
 | currency | enum | `AUD` / `JPY` / `USD` |
 | type | enum | `transaction` / `savings` / `term_deposit` / `super` / `other` |
-| owner | enum | `rodrigo` / `nat` / `joint` |
+| owner | enum | `gabriel` / `ana` / `joint` |
 | balance | number | Amount in native currency |
 | interest_rate | number | % p.a. Null if not applicable |
 | status | enum | `active` / `matured` / `pending_renewal` / `inactive` |
@@ -277,7 +277,7 @@ Even though historical tracking is out of scope for v1 UI, this tab is worth pop
 ## Further Notes
 
 ### Data update cadence
-Balances updated fortnightly at minimum, monthly reliably. Both Rodrigo and Nat update the sheet. The app surfaces last_updated per account and a global freshness indicator. No forced update prompts — this is a visibility tool.
+Balances updated fortnightly at minimum, monthly reliably. Both Gabriel and Ana update the sheet. The app surfaces last_updated per account and a global freshness indicator. No forced update prompts — this is a visibility tool.
 
 ### Security posture
 The Google Sheets API key will be visible in the client bundle. Mitigation: key scoped to Sheets API read-only, restricted to the specific spreadsheet ID in Google Cloud Console. The spreadsheet itself remains privately shared (not public). Acceptable risk for a personal household tool with no financial transaction capability.

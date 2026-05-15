@@ -46,7 +46,17 @@ function DashboardBody({ sheet, fx }) {
         <AccountsTab loading={sheet.loading} error={sheet.error} />
       ) : null}
 
-      {tab === 'goals' ? <GoalsTab /> : null}
+      {tab === 'goals' ? (
+        <GoalsTab
+          goals={sheet.data?.goals ?? []}
+          accounts={accounts}
+          settings={settings}
+          latestRates={latestRates}
+          spreadsheetId={import.meta.env.VITE_SHEET_ID}
+          sheetGids={sheet.data?.sheetGids}
+          loading={sheet.loading}
+        />
+      ) : null}
       {tab === 'convert' ? <ConvertTab /> : null}
     </>
   )

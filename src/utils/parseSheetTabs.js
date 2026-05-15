@@ -137,8 +137,9 @@ export function parseTabByTitle(tabTitle, rows) {
 /**
  * @param {string[]} tabOrder
  * @param {Record<string, string[][]>} titleToRows
+ * @param {Record<string, number>} [sheetGids]
  */
-export function buildParsedBundle(tabOrder, titleToRows) {
+export function buildParsedBundle(tabOrder, titleToRows, sheetGids = {}) {
   /** @type {import('../types/sheetTypes.js').AccountRow[]} */
   const accounts = []
   /** @type {import('../types/sheetTypes.js').GoalRow[]} */
@@ -173,5 +174,6 @@ export function buildParsedBundle(tabOrder, titleToRows) {
     settings,
     rawTabs,
     tabOrder: [...tabOrder],
+    sheetGids: { ...sheetGids },
   }
 }

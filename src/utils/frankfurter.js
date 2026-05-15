@@ -1,4 +1,4 @@
-const FRANKFURTER = 'https://api.frankfurter.dev/v1'
+const FRANKFURTER = 'https://api.frankfurter.app'
 
 /**
  * @returns {{ from: string, to: string }}

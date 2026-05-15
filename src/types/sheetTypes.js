@@ -11,7 +11,7 @@
  */
 
 /**
- * @typedef {'gabriel' | 'ana' | 'joint'} OwnerCode
+ * @typedef {'rodrigo' | 'nat' | 'joint'} OwnerCode
  */
 
 /**
@@ -73,6 +73,7 @@
  * @property {SettingsRow | null} settings
  * @property {Record<string, string[][]>} rawTabs
  * @property {string[]} tabOrder
+ * @property {Record<string, number>} sheetGids — Google `sheetId` per tab title (for edit URLs)
  */
 
 export {}

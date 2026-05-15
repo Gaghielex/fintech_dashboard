@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { NavigationContext } from './navigationContext.js'
 
 /**
- * @typedef {{ country: 'AU'|'JP'|'EC'|null, owner: 'gabriel'|'ana'|'joint'|null, retirementOnly: boolean }} AccountsEntry
+ * @typedef {{ country: 'AU'|'JP'|'EC'|null, owner: 'rodrigo'|'nat'|'joint'|null, retirementOnly: boolean }} AccountsEntry
  */
 
 const defaultEntry = /** @type {AccountsEntry} */ ({

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   batchGetValuesForTabs,
-  fetchSpreadsheetTabTitles,
+  fetchSpreadsheetSheetMetas,
 } from '../utils/googleSheets.js'
 import { buildParsedBundle } from '../utils/parseSheetTabs.js'
 
@@ -54,8 +54,12 @@ export function useSheetData() {
       setLoading(true)
       setError(null)
       try {
-        const titles = await fetchSpreadsheetTabTitles(spreadsheetId, apiKey)
+        const metas = await fetchSpreadsheetSheetMetas(spreadsheetId, apiKey)
         if (cancelled) return
+        const titles = metas.map((m) => m.title)
+        const sheetGids = Object.fromEntries(
+          metas.map((m) => [m.title, m.sheetId]),
+        )
         const batch = await batchGetValuesForTabs(
           spreadsheetId,
           apiKey,
@@ -68,7 +72,7 @@ export function useSheetData() {
         for (let i = 0; i < titles.length; i++) {
           titleToRows[titles[i]] = valueRanges[i]?.values ?? []
         }
-        const bundle = buildParsedBundle(titles, titleToRows)
+        const bundle = buildParsedBundle(titles, titleToRows, sheetGids)
         setData(bundle)
         setLastFetchedAt(new Date().toISOString())
       } catch (e) {

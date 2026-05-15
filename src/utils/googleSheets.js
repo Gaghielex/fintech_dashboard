@@ -3,23 +3,36 @@ import { toA1Range } from './sheetRange.js'
 /**
  * @param {string} spreadsheetId
  * @param {string} apiKey
- * @returns {Promise<string[]>}
+ * @returns {Promise<{ title: string, sheetId: number }[]>}
  */
-export async function fetchSpreadsheetTabTitles(spreadsheetId, apiKey) {
+export async function fetchSpreadsheetSheetMetas(spreadsheetId, apiKey) {
   const url = new URL(
     `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}`,
   )
-  url.searchParams.set('fields', 'sheets.properties(title)')
+  url.searchParams.set('fields', 'sheets.properties(sheetId,title)')
   url.searchParams.set('key', apiKey)
   const res = await fetch(url)
   if (!res.ok) {
     const text = await res.text()
     throw new Error(`Sheets metadata ${res.status}: ${text.slice(0, 200)}`)
   }
-  /** @type {{ sheets?: { properties: { title: string } }[] }} */
+  /** @type {{ sheets?: { properties: { title: string, sheetId: number } }[] }} */
   const json = await res.json()
   const sheets = json.sheets ?? []
-  return sheets.map((s) => s.properties.title)
+  return sheets.map((s) => ({
+    title: s.properties.title,
+    sheetId: s.properties.sheetId,
+  }))
+}
+
+/**
+ * @param {string} spreadsheetId
+ * @param {string} apiKey
+ * @returns {Promise<string[]>}
+ */
+export async function fetchSpreadsheetTabTitles(spreadsheetId, apiKey) {
+  const metas = await fetchSpreadsheetSheetMetas(spreadsheetId, apiKey)
+  return metas.map((m) => m.title)
 }
 
 /**
