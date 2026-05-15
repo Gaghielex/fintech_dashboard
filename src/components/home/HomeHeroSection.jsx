@@ -26,7 +26,7 @@ export function HomeHeroSection({
           Household net worth
         </p>
         <p
-          className="font-syne mt-1 flex flex-wrap items-baseline gap-x-1 text-[clamp(2.25rem,8vw,3rem)] font-extrabold leading-none tracking-tight text-primary"
+          className="font-syne mt-1 flex flex-wrap items-baseline gap-x-1 leading-none tracking-tight text-primary"
           aria-live="polite"
         >
           {ratesReady ? (
@@ -36,18 +36,21 @@ export function HomeHeroSection({
               part.type === 'currency' ? (
                 <span
                   key={`p-${i}`}
-                  className="font-dm-sans text-[0.42em] font-medium tracking-normal text-primary/50"
+                  className="font-dm-sans font-extrabold tracking-normal text-primary/70 [font-size:calc(clamp(2.25rem,8vw,3rem)-2.5pt)]"
                 >
                   {part.value}
                 </span>
               ) : (
-                <span key={`p-${i}`} className="font-extrabold">
+                <span
+                  key={`p-${i}`}
+                  className="text-[clamp(2.25rem,8vw,3rem)] font-extrabold"
+                >
                   {part.value}
                 </span>
               ),
             )
           ) : (
-            '—'
+            <span className="text-[clamp(2.25rem,8vw,3rem)] font-extrabold">—</span>
           )}
         </p>
         {!ratesReady ? (
