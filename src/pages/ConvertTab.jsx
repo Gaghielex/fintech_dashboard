@@ -64,7 +64,7 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
   const usdSpot = latestRates?.USD ?? 0
 
   return (
-    <div className="flex flex-col space-y-6 pb-6 pt-2">
+    <div className="flex flex-col space-y-6 pb-6 pt-8">
       <header className="space-y-2">
         <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
           Convert
