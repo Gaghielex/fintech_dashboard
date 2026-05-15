@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { computeHomeMetrics } from '../utils/financeAggregate.js'
 import { HomeHeader } from '../components/home/HomeHeader.jsx'
-import { IllustrationPlaceholder } from '../components/home/IllustrationPlaceholder.jsx'
+import { HomeHeroImage, HOME_HERO_SPACER, HomeHeroGlassLayer } from '../components/home/HomeHeroImage.jsx'
 import { HomeHeroSection } from '../components/home/HomeHeroSection.jsx'
 import { GeographySection } from '../components/home/GeographySection.jsx'
 import { OwnershipSection } from '../components/home/OwnershipSection.jsx'
@@ -46,71 +46,89 @@ export function HomeTab({
   )
 
   return (
-    <div className="flex min-h-[calc(100dvh-5.5rem)] flex-col">
-      <HomeHeader />
+    <motion.div className="relative -mt-4 flex min-h-[calc(100dvh-5.5rem)] flex-col lg:mt-0">
+      <HomeHeroImage />
 
-      <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
-        <IllustrationPlaceholder />
-      </motion.div>
+      <motion.div
+        custom={0}
+        variants={fadeUp}
+        initial="hidden"
+        animate="visible"
+        className="shrink-0"
+        style={{ height: HOME_HERO_SPACER }}
+        aria-hidden
+      />
 
-      {!accounts.length ? (
-        <p className="font-dm-sans mb-4 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink-muted">
-          No account rows in the sheet yet. Balances below stay at zero until you add data.
-        </p>
-      ) : null}
+      <HomeHeroGlassLayer>
+        <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
+          <HomeHeader />
+        </motion.div>
 
-      <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
-        <HomeHeroSection
-          netWorthAud={metrics.netWorthAud}
-          liquidAud={metrics.liquidAud}
-          depositsAud={metrics.depositsAud}
-          superAud={metrics.superAud}
-          ratesReady={ratesReady}
-        />
-      </motion.div>
-
-      <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
-        <GeographySection
-          geography={metrics.geography}
-          retirementAud={metrics.retirementAud}
-          rates={latestRates ?? { JPY: 0, USD: 0 }}
-          ratesReady={ratesReady}
-        />
-      </motion.div>
-
-      <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
-        <OwnershipSection
-          gabrielAud={metrics.ownership.gabrielAud}
-          anaAud={metrics.ownership.anaAud}
-          jointAud={metrics.ownership.jointAud}
-          ratesReady={ratesReady}
-        />
-      </motion.div>
-
-      <motion.div custom={4} variants={fadeUp} initial="hidden" animate="visible" className="mt-auto space-y-4">
-        {fxFromCache && ratesReady && fxRatesCachedAt ? (
-          <p className="font-dm-sans rounded-lg border border-warning/50 bg-warning/10 px-3 py-2 text-sm text-warning">
-            Rates as of{' '}
-            {new Date(fxRatesCachedAt).toLocaleString('en-AU', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-            {' — '}
-            could not refresh. Converted amounts may be stale.
+        {!accounts.length ? (
+          <p className="font-dm-sans mb-4 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink-muted">
+            No account rows in the sheet yet. Balances below stay at zero until you add data.
           </p>
         ) : null}
 
-        <AddToHomeScreenBanner />
+        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
+          <HomeHeroSection
+            netWorthAud={metrics.netWorthAud}
+            liquidAud={metrics.liquidAud}
+            depositsAud={metrics.depositsAud}
+            superAud={metrics.superAud}
+            ratesReady={ratesReady}
+          />
+        </motion.div>
 
-        <FreshnessBar
-          globalLastUpdated={metrics.globalLastUpdated}
-          staleThresholdDays={metrics.staleThresholdDays}
-          fxDateLabel={fxDateLabel}
-        />
-      </motion.div>
-    </div>
+        <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
+          <GeographySection
+            geography={metrics.geography}
+            retirementAud={metrics.retirementAud}
+            rates={latestRates ?? { JPY: 0, USD: 0 }}
+            ratesReady={ratesReady}
+          />
+        </motion.div>
+
+        <motion.div custom={4} variants={fadeUp} initial="hidden" animate="visible">
+          <OwnershipSection
+            gabrielAud={metrics.ownership.gabrielAud}
+            anaAud={metrics.ownership.anaAud}
+            jointAud={metrics.ownership.jointAud}
+            ratesReady={ratesReady}
+          />
+        </motion.div>
+
+        <motion.div
+          custom={5}
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          className="mt-auto space-y-4 pb-2"
+        >
+          {fxFromCache && ratesReady && fxRatesCachedAt ? (
+            <p className="font-dm-sans rounded-lg border border-warning/50 bg-warning/10 px-3 py-2 text-sm text-warning">
+              Rates as of{' '}
+              {new Date(fxRatesCachedAt).toLocaleString('en-AU', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+              {' — '}
+              could not refresh. Converted amounts may be stale.
+            </p>
+          ) : null}
+
+          <AddToHomeScreenBanner />
+
+          <FreshnessBar
+            globalLastUpdated={metrics.globalLastUpdated}
+            staleThresholdDays={metrics.staleThresholdDays}
+            fxDateLabel={fxDateLabel}
+          />
+        </motion.div>
+      </HomeHeroGlassLayer>
+    </motion.div>
   )
 }

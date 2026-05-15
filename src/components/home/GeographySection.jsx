@@ -1,5 +1,7 @@
 import { GeographyTile } from './GeographyTile.jsx'
+import { GEO_FLAGS } from './geographyFlags.js'
 import { useNavigation } from '../../context/useNavigation.js'
+import { HOME_SECTION_TITLE_CLASS } from './sectionTitle.js'
 
 /**
  * @param {{
@@ -26,9 +28,10 @@ export function GeographySection({
 
   return (
     <section className="mb-8">
-      <h2 className="font-syne mb-3 text-lg font-bold text-ink">Where it lives</h2>
+      <h2 className={HOME_SECTION_TITLE_CLASS}>Where is our money?</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <GeographyTile
+          flag={GEO_FLAGS.AU}
           title="Australia"
           subtitle="Cash & deposits"
           regionNative="AUD"
@@ -38,6 +41,7 @@ export function GeographySection({
           onNavigate={() => goToAccountsByCountry('AU')}
         />
         <GeographyTile
+          flag={GEO_FLAGS.JP}
           title="Japan"
           subtitle="Cash & deposits"
           regionNative="JPY"
@@ -47,6 +51,7 @@ export function GeographySection({
           onNavigate={() => goToAccountsByCountry('JP')}
         />
         <GeographyTile
+          flag={GEO_FLAGS.EC}
           title="Ecuador"
           subtitle="Cash & deposits"
           regionNative="USD"
@@ -56,6 +61,7 @@ export function GeographySection({
           onNavigate={() => goToAccountsByCountry('EC')}
         />
         <GeographyTile
+          flag={GEO_FLAGS.retirement}
           title="Retirement"
           subtitle="Superannuation"
           regionNative="AUD"

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { scrollAppToTop } from '../utils/scrollAppToTop.js'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigation } from '../context/useNavigation.js'
 import { convertToAud } from '../utils/currencyConvert.js'
@@ -398,6 +399,10 @@ export function AccountsTab({
   }, [accountsEntry])
   /* eslint-enable react-hooks/set-state-in-effect */
 
+  useEffect(() => {
+    scrollAppToTop()
+  }, [accountsEntry])
+
   const toggleSection = useCallback((key) => {
     setCollapsedSections((prev) => {
       const next = new Set(prev)
@@ -558,12 +563,12 @@ export function AccountsTab({
         <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
           Accounts
         </h1>
-        <div className="mt-1 flex items-baseline gap-2">
+        <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           {loading ? (
             <p className="font-dm-sans text-sm text-ink-muted">Loading…</p>
           ) : (
             <>
-              <span className="font-dm-mono text-sm font-medium tabular-nums text-ink">
+              <span className="font-dm-mono text-xl font-bold tabular-nums text-primary">
                 {formatMoney(totalVisibleAud, 'AUD', { maxFractionDigits: 0 })}
               </span>
               <span className="font-dm-sans text-xs text-ink-muted">
@@ -591,7 +596,7 @@ export function AccountsTab({
       )}
 
       {!accountsEntry.retirementOnly && (
-        <div className="flex gap-2 overflow-x-auto pb-0.5">
+        <div className="flex flex-wrap gap-2 pb-0.5">
           {FILTER_OPTIONS.map((opt) => (
             <button
               key={opt.id}

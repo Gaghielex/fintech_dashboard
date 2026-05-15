@@ -65,17 +65,15 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
 
   return (
     <div className="flex flex-col space-y-6 pb-6">
-      <header className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
-            Convert
-          </h1>
-          <p className="font-dm-sans mt-1 text-sm text-ink-muted">
-            Tri-currency workspace using Frankfurter spot rates.
-          </p>
-        </div>
+      <header className="space-y-2">
+        <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
+          Convert
+        </h1>
+        <p className="font-dm-sans text-sm text-ink-muted">
+          Tri-currency workspace using Frankfurter spot rates.
+        </p>
         <p
-          className="font-dm-mono text-right text-[11px] leading-tight"
+          className="font-dm-mono text-[11px] leading-tight"
           aria-live="polite"
         >
           {ratesReady ? (
@@ -85,8 +83,7 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
           ) : (
             <span className="text-warning">Rates unavailable</span>
           )}
-          <br />
-          <span className="text-ink-muted">{updatedLabel}</span>
+          <span className="text-ink-muted"> · {updatedLabel}</span>
         </p>
       </header>
 

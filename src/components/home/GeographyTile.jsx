@@ -28,8 +28,11 @@ function IconCycle() {
   )
 }
 
+import { FlagBadge } from './HouseholdVisuals.jsx'
+
 /**
  * @param {{
+ *   flag: string,
  *   title: string,
  *   subtitle: string,
  *   regionNative: 'AUD'|'JPY'|'USD',
@@ -41,6 +44,7 @@ function IconCycle() {
  * }} props
  */
 export function GeographyTile({
+  flag,
   title,
   subtitle,
   regionNative,
@@ -86,13 +90,16 @@ export function GeographyTile({
       tabIndex={0}
       role="button"
     >
-      {/* Header row — title + chevron */}
+      {/* Header row — flag + title + chevron */}
       <div className="flex items-start justify-between gap-2">
-        <div>
-          <p className="font-syne text-lg font-bold leading-tight text-ink">
-            {title}
-          </p>
-          <p className="font-dm-sans text-xs text-ink-muted">{subtitle}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <FlagBadge flag={flag} label={title} />
+            <p className="font-syne text-lg font-bold leading-tight text-ink">
+              {title}
+            </p>
+          </div>
+          <p className="font-dm-sans pl-8 text-xs text-ink-muted">{subtitle}</p>
         </div>
         <div className="flex items-center gap-1.5 pt-0.5">
           {isRetirement ? (

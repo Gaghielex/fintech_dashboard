@@ -1,13 +1,28 @@
 import { motion } from 'framer-motion'
-import { formatMoney } from '../../utils/formatCurrency.js'
 import { useNavigation } from '../../context/useNavigation.js'
+import { OwnerAvatar } from './HouseholdVisuals.jsx'
+import { HOME_SECTION_TITLE_CLASS } from './sectionTitle.js'
 
-function IconChevronRight() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0 text-ink-faint">
-      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+function formatCompactAud(amount) {
+  const n = Math.round(Number(amount) || 0)
+  const abs = Math.abs(n)
+  const sign = n < 0 ? '-' : ''
+  if (abs >= 1_000_000) {
+    const m = abs / 1_000_000
+    const s = m >= 10 ? Math.round(m) : m.toFixed(1).replace(/\.0$/, '')
+    return `${sign}$${s}M`
+  }
+  if (abs >= 1000) {
+    const k = Math.round((abs / 1000) * 10) / 10
+    const s = k.toFixed(1).replace(/\.0$/, '')
+    return `${sign}$${s}k`
+  }
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+    currencyDisplay: 'narrowSymbol',
+    maximumFractionDigits: 0,
+  }).format(n)
 }
 
 /**
@@ -28,53 +43,58 @@ export function OwnershipSection({
 
   return (
     <section className="mb-8">
-      <h2 className="font-syne mb-3 text-lg font-bold text-ink">Ownership</h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <h2 className={HOME_SECTION_TITLE_CLASS}>How much in my accounts?</h2>
+      <motion.div className="grid grid-cols-3 gap-2 sm:gap-3">
         <OwnerTile
+          owner="gabriel"
           label="Gabriel"
-          hint="includes joint"
           amountAud={gabrielAud}
           ready={ratesReady}
           onOpen={() => goToAccountsByOwner('gabriel')}
         />
         <OwnerTile
+          owner="ana"
           label="Ana"
-          hint="includes joint"
           amountAud={anaAud}
           ready={ratesReady}
           onOpen={() => goToAccountsByOwner('ana')}
         />
         <OwnerTile
+          owner="joint"
           label="Joint"
-          hint="joint accounts only"
           amountAud={jointAud}
           ready={ratesReady}
           onOpen={() => goToAccountsByOwner('joint')}
         />
-      </div>
+      </motion.div>
     </section>
   )
 }
 
 /**
- * @param {{ label: string, hint: string, amountAud: number, ready: boolean, onOpen: () => void }} props
+ * @param {{
+ *   owner: 'gabriel' | 'ana' | 'joint',
+ *   label: string,
+ *   amountAud: number,
+ *   ready: boolean,
+ *   onOpen: () => void,
+ * }} props
  */
-function OwnerTile({ label, hint, amountAud, ready, onOpen }) {
+function OwnerTile({ owner, label, amountAud, ready, onOpen }) {
   return (
     <motion.button
       type="button"
       onClick={onOpen}
       whileTap={{ opacity: 0.72, scale: 0.98 }}
       transition={{ duration: 0.1 }}
-      className="rounded-xl border border-border bg-surface p-4 text-left outline-none transition-colors hover:bg-surface-1/80 focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="flex min-w-0 flex-col items-center gap-2 rounded-xl border border-border bg-surface px-2 py-4 text-center outline-none transition-colors hover:bg-surface-1/80 focus-visible:ring-2 focus-visible:ring-primary/40"
     >
-      <div className="flex items-start justify-between gap-1">
-        <p className="font-syne text-base font-bold text-ink">{label}</p>
-        <IconChevronRight />
-      </div>
-      <p className="font-dm-sans text-[10px] text-ink-faint">{hint}</p>
-      <p className="font-dm-mono mt-3 text-lg font-medium tabular-nums text-ink">
-        {ready ? formatMoney(amountAud, 'AUD') : '—'}
+      <OwnerAvatar owner={owner} size="40" />
+      <p className="font-dm-mono text-lg font-bold leading-tight tabular-nums text-ink">
+        {ready ? formatCompactAud(amountAud) : '—'}
+      </p>
+      <p className="font-dm-sans text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+        {label}
       </p>
     </motion.button>
   )

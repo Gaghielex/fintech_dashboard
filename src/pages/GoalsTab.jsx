@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
-import { computeHomeMetrics } from '../utils/financeAggregate.js'
+import { computeGoalsLiquidAud } from '../utils/financeAggregate.js'
+import { computeGoalsLiquidAllocation } from '../utils/goalProgress.js'
 import { getGoalsSheetEditUrl } from '../utils/goalsSheetUrl.js'
 import { GoalsLiquidStrip } from '../components/goals/GoalsLiquidStrip.jsx'
 import { GoalCard } from '../components/goals/GoalCard.jsx'
@@ -22,9 +23,17 @@ export function GoalsTab({
   spreadsheetId,
   sheetGids,
 }) {
-  const metrics = useMemo(
-    () => computeHomeMetrics(accounts, settings, latestRates),
-    [accounts, settings, latestRates],
+  const [upSaversOnly, setUpSaversOnly] = useState(true)
+
+  const liquidAud = useMemo(
+    () =>
+      computeGoalsLiquidAud(accounts, latestRates, { upSaversOnly }),
+    [accounts, latestRates, upSaversOnly],
+  )
+
+  const goalAllocations = useMemo(
+    () => computeGoalsLiquidAllocation(goals, liquidAud),
+    [goals, liquidAud],
   )
 
   const ratesReady = Boolean(
@@ -74,9 +83,11 @@ export function GoalsTab({
       )}
 
       <GoalsLiquidStrip
-        liquidAud={metrics.liquidAud}
+        liquidAud={liquidAud}
         ratesReady={ratesReady}
         goals={goals}
+        upSaversOnly={upSaversOnly}
+        onUpSaversOnlyChange={setUpSaversOnly}
       />
 
       <section className="space-y-4">
@@ -91,7 +102,7 @@ export function GoalsTab({
             <GoalCard
               key={g.id ? String(g.id) : `goal-${idx}`}
               goal={g}
-              liquidAud={metrics.liquidAud}
+              allocatedAud={goalAllocations[idx] ?? 0}
               ratesReady={ratesReady}
             />
           ))

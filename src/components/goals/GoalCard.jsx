@@ -1,139 +1,225 @@
 import { formatMoney } from '../../utils/formatCurrency.js'
-import { computeGoalMetrics } from '../../utils/goalProgress.js'
+import {
+  computeGoalMetrics,
+  SCHEDULE_STATUS_LABEL,
+} from '../../utils/goalProgress.js'
+import { GoalCompletionDonut } from './GoalCompletionDonut.jsx'
+
+function GoalIcon({ accent }) {
+  const isGold = accent === 'gold'
+  return (
+    <span
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
+        isGold ? 'bg-accent-gold/20 text-accent-gold' : 'bg-primary/15 text-primary'
+      }`}
+      aria-hidden
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 3 2 8.5 12 14l10-5.5L12 3Zm0 5.5L4.2 8.5 12 11.8l7.8-3.3L12 8.5ZM4 11.5v4L12 21l8-5.5v-4L12 16 4 11.5Z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+  )
+}
+
+/** @param {{ status: import('../../utils/goalProgress.js').ScheduleStatus }} props */
+function scheduleBadgeClass(status) {
+  switch (status) {
+    case 'on_track':
+      return 'bg-primary/15 text-primary'
+    case 'critical':
+      return 'bg-negative/15 text-negative'
+    case 'behind':
+      return 'bg-warning/15 text-warning'
+    case 'not_started':
+      return 'bg-surface-1 text-ink-muted'
+    default:
+      return 'bg-surface-1 text-ink-muted'
+  }
+}
+
+/** @param {{ status: Exclude<import('../../utils/goalProgress.js').ScheduleStatus, 'none'> }} props */
+function StatusBadge({ status }) {
+  return (
+    <span
+      className={`font-dm-sans inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${scheduleBadgeClass(status)}`}
+    >
+      {SCHEDULE_STATUS_LABEL[status]}
+    </span>
+  )
+}
 
 /**
  * @param {{
  *   goal: import('../../types/sheetTypes.js').GoalRow,
- *   liquidAud: number,
+ *   allocatedAud: number,
  *   ratesReady: boolean,
  * }} props
  */
-export function GoalCard({ goal, liquidAud, ratesReady }) {
+export function GoalCard({ goal, allocatedAud, ratesReady }) {
   const now = new Date()
-  const m = computeGoalMetrics(goal, liquidAud, now)
+  const m = computeGoalMetrics(goal, allocatedAud, now)
   const accent = String(goal.accent || 'teal').toLowerCase()
-  const accentBorder =
-    accent === 'gold' ? 'border-l-accent-gold' : 'border-l-primary'
   const fillClass =
     accent === 'gold' ? 'bg-accent-gold/90' : 'bg-primary/90'
+  const amountClass =
+    accent === 'gold' ? 'text-accent-gold' : 'text-primary'
 
   const timeBarPct = m.validWindow ? m.timeElapsedPct * 100 : 0
 
-  const dueLabel = goal.due_date
+  const dueShort = goal.due_date
     ? new Date(goal.due_date).toLocaleDateString('en-AU', {
         day: 'numeric',
         month: 'short',
-        year: 'numeric',
       })
     : '—'
 
-  const chipDays =
-    m.daysRemaining === null
-      ? '—'
-      : `${m.daysRemaining} day${m.daysRemaining === 1 ? '' : 's'} left`
-
-  // P2-08: shorten label
-  const surplusLabel = m.surplusVsSchedule >= 0 ? 'Surplus' : 'Shortfall'
-  const surplusAbs = Math.abs(m.surplusVsSchedule)
-
-  // P2-03: only render threshold tick when it falls in a visible range (5%–95%)
+  const scheduleActive =
+    m.schedulePhase === 'active' || m.schedulePhase === 'ended'
   const showThresholdTick =
-    ratesReady && m.validWindow && m.thresholdPct >= 5 && m.thresholdPct <= 95
+    ratesReady &&
+    scheduleActive &&
+    m.thresholdPct >= 5 &&
+    m.thresholdPct <= 95
   const wellAhead =
-    ratesReady && m.validWindow && m.thresholdPct < 5 && m.progressPct >= 5
+    ratesReady &&
+    m.schedulePhase === 'active' &&
+    m.thresholdPct < 5 &&
+    m.progressPct >= 5
 
+  const surplusVsTargetLabel = (() => {
+    if (!ratesReady) return '—'
+    if (m.surplusVsTarget >= 0) {
+      return `+${formatMoney(m.surplusVsTarget, 'AUD', { maxFractionDigits: 0 })}`
+    }
+    return `${formatMoney(m.remainingToTarget, 'AUD', { maxFractionDigits: 0 })} to go`
+  })()
   return (
     <article
-      className={`rounded-xl border border-border bg-surface py-4 pl-4 pr-4 border-l-[4px] ${accentBorder}`}
+      className="rounded-xl border border-border bg-surface px-3.5 py-3"
     >
-      <header className="flex flex-wrap items-start justify-between gap-2">
-        <div>
-          <h2 className="font-syne text-lg font-extrabold leading-tight text-ink">
-            {goal.goal_name || 'Untitled goal'}
-          </h2>
-          {goal.subtitle ? (
-            <p className="font-dm-sans text-sm text-ink-muted">{goal.subtitle}</p>
-          ) : null}
+      <header className="flex items-start justify-between gap-2">
+        <div className="flex min-w-0 flex-1 items-start gap-2">
+          <GoalIcon accent={accent} />
+          <div className="min-w-0 flex-1">
+            <h2 className="font-syne truncate text-base font-extrabold leading-snug text-ink">
+              {goal.goal_name || 'Untitled goal'}
+            </h2>
+            {goal.subtitle ? (
+              <p className="font-dm-sans truncate text-xs text-ink-muted">{goal.subtitle}</p>
+            ) : null}
+          </div>
         </div>
-        <p className="font-dm-mono text-right text-xs text-ink-muted">
-          Target{' '}
-          <span className="font-medium text-ink">
-            {ratesReady ? formatMoney(m.target, 'AUD') : '—'}
-          </span>
-        </p>
+        <div className="shrink-0 pl-2 text-right">
+          <p className="font-dm-mono text-base font-bold tabular-nums text-ink">
+            {ratesReady ? formatMoney(m.target, 'AUD', { maxFractionDigits: 0 }) : '—'}
+          </p>
+          <p className="font-dm-sans text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+            Target
+          </p>
+        </div>
       </header>
 
-      <div className="mt-4">
-        <div className="flex items-center justify-between gap-2">
-          <span className="font-dm-sans text-xs font-medium text-ink-muted">
-            Progress (liquid ÷ target)
-          </span>
-          <span className="font-dm-mono text-xs tabular-nums text-ink">
-            {ratesReady ? `${m.progressPct.toFixed(0)}%` : '—'}
-          </span>
-        </div>
-        <div className="relative mt-1.5 h-3 overflow-hidden rounded-full bg-surface-1">
+      <div className="mt-3">
+        <div className="relative h-2 overflow-hidden rounded-full bg-surface-1">
           <div
             className={`h-full rounded-full ${fillClass}`}
             style={{ width: `${ratesReady ? m.progressPct : 0}%` }}
           />
           {showThresholdTick ? (
             <div
-              className="pointer-events-none absolute top-0 z-10 h-full w-0.5 bg-warning shadow-[0_0_0_1px_rgba(13,17,23,0.9)]"
-              style={{ left: `calc(${m.thresholdPct}% - 1px)` }}
+              className="pointer-events-none absolute top-1/2 z-10 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-canvas bg-ink"
+              style={{ left: `${m.thresholdPct}%` }}
               title="Schedule threshold"
             />
           ) : null}
         </div>
         {wellAhead ? (
-          <p className="font-dm-mono mt-1.5 text-[11px] leading-snug text-primary">
-            Well ahead of schedule
-          </p>
-        ) : ratesReady && m.validWindow ? (
-          <p className="font-dm-mono mt-1.5 text-[11px] leading-snug text-ink-muted">
-            Need{' '}
-            <span className="font-medium text-ink">
-              {formatMoney(m.thresholdToday, 'AUD')}
-            </span>{' '}
-            by now (linear schedule)
-          </p>
-        ) : (
-          <p className="font-dm-mono mt-1.5 text-[11px] text-ink-faint">
-            Add start_date &amp; due_date to show the threshold line.
-          </p>
-        )}
+          <p className="font-dm-sans mt-1.5 text-[11px] text-primary">Well ahead of schedule</p>
+        ) : null}
+
+        <div className="mt-2.5 grid grid-cols-2 gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <p className={`font-dm-mono text-base font-bold tabular-nums ${amountClass}`}>
+                {ratesReady ? formatMoney(allocatedAud, 'AUD', { maxFractionDigits: 0 }) : '—'}
+              </p>
+              {ratesReady && m.target > 0 ? (
+                <GoalCompletionDonut percent={m.progressPct} accent={accent} size={32} />
+              ) : null}
+            </div>
+            <p className="font-dm-sans text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+              Available today
+            </p>
+          </div>
+          <div className="min-w-0 text-right">
+            <p className="font-dm-mono text-xs font-bold leading-tight tabular-nums text-ink whitespace-nowrap">
+              {surplusVsTargetLabel}
+            </p>
+            <p className="font-dm-sans text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+              Surplus vs target
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-3 grid grid-cols-3 gap-1.5">
+        <StatusChip
+          scheduleStatus={
+            ratesReady && m.scheduleStatus !== 'none' ? m.scheduleStatus : null
+          }
+        />
+        <StatChip
+          label="Days left"
+          value={
+            m.daysRemaining === null
+              ? '—'
+              : String(m.daysRemaining)
+          }
+          variant="neutral"
+        />
+        <StatChip label="Due date" value={dueShort} variant="neutral" />
+      </div>
+
+      <div className="mt-3">
         <div className="flex items-center justify-between gap-2">
-          <span className="font-dm-sans text-xs font-medium text-ink-muted">
+          <span className="font-dm-sans text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
             Time elapsed
           </span>
-          <span className="font-dm-mono text-xs tabular-nums text-ink">
-            {ratesReady && m.validWindow
+          <span className="font-dm-mono text-[11px] tabular-nums text-ink">
+            {ratesReady && m.schedulePhase !== 'invalid'
               ? `${(m.timeElapsedPct * 100).toFixed(0)}%`
               : '—'}
           </span>
         </div>
-        <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-1">
+        <div className="mt-1 h-1 overflow-hidden rounded-full bg-surface-1">
           <div
             className="h-full rounded-full bg-ink-faint/80"
             style={{ width: `${ratesReady ? timeBarPct : 0}%` }}
           />
         </div>
       </div>
-
-      {/* P2-04: chips — surplus/shortfall · days remaining · due date */}
-      <div className="mt-4 flex flex-wrap gap-2">
-        <StatChip
-          label={surplusLabel}
-          value={ratesReady ? formatMoney(surplusAbs, 'AUD') : '—'}
-          variant={m.surplusVsSchedule >= 0 ? 'positive' : 'negative'}
-        />
-        <StatChip label="Days remaining" value={chipDays} variant="neutral" />
-        <StatChip label="Due date" value={dueLabel} variant="neutral" />
-      </div>
     </article>
+  )
+}
+
+/**
+ * @param {{ scheduleStatus: import('../../utils/goalProgress.js').ScheduleStatus | null }} props
+ */
+function StatusChip({ scheduleStatus }) {
+  return (
+    <div className="flex flex-col items-center justify-center rounded-lg border border-border bg-surface-1 px-1.5 py-1.5">
+      {scheduleStatus === null || scheduleStatus === 'none' ? (
+        <p className="font-dm-mono text-xs font-bold text-ink">—</p>
+      ) : (
+        <StatusBadge status={scheduleStatus} />
+      )}
+      <p className="font-dm-sans mt-1 text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+        Status
+      </p>
+    </div>
   )
 }
 
@@ -141,20 +227,18 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
  * @param {{ label: string, value: string, variant: 'positive'|'negative'|'neutral' }} props
  */
 function StatChip({ label, value, variant }) {
-  const cls =
+  const valueCls =
     variant === 'positive'
-      ? 'border-positive/40 bg-positive/10 text-positive'
+      ? 'text-positive'
       : variant === 'negative'
-        ? 'border-negative/40 bg-negative/10 text-negative'
-        : 'border-border bg-surface-1 text-ink-muted'
+        ? 'text-negative'
+        : 'text-ink'
   return (
-    <div
-      className={`rounded-lg border px-2.5 py-1.5 font-dm-sans text-[11px] leading-tight ${cls}`}
-    >
-      <span className="block text-ink-faint">{label}</span>
-      <span className="font-dm-mono mt-0.5 block text-sm font-medium text-ink">
-        {value}
-      </span>
+    <div className="rounded-lg border border-border bg-surface-1 px-1.5 py-1.5 text-center">
+      <p className={`font-dm-mono text-xs font-bold tabular-nums ${valueCls}`}>{value}</p>
+      <p className="font-dm-sans mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+        {label}
+      </p>
     </div>
   )
 }

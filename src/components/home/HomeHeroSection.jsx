@@ -1,5 +1,17 @@
-import { formatMoney, formatMoneyParts } from '../../utils/formatCurrency.js'
+import { formatMoney } from '../../utils/formatCurrency.js'
 import { useCountUp } from '../../hooks/useCountUp.js'
+
+const HERO_AMOUNT = 'clamp(2rem, 8vw, 3rem)'
+const HERO_AUD = 'clamp(0.8rem, 2.5vw, 1rem)'
+
+function formatHeroAmount(amount) {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+    currencyDisplay: 'narrowSymbol',
+    maximumFractionDigits: 0,
+  }).format(amount)
+}
 
 /**
  * @param {{
@@ -20,64 +32,96 @@ export function HomeHeroSection({
   const displayNetWorth = useCountUp(netWorthAud, ratesReady)
 
   return (
-    <section className="mb-8 space-y-4">
-      <div>
-        <p className="font-dm-sans text-xs font-medium uppercase tracking-wider text-ink-muted">
-          Household net worth
-        </p>
-        <p
-          className="font-syne mt-1 flex flex-wrap items-baseline gap-x-1 leading-none tracking-tight text-primary"
-          aria-live="polite"
-        >
-          {ratesReady ? (
-            formatMoneyParts(displayNetWorth, 'AUD', {
-              maxFractionDigits: 0,
-            }).map((part, i) =>
-              part.type === 'currency' ? (
-                <span
-                  key={`p-${i}`}
-                  className="font-dm-sans font-extrabold tracking-normal text-primary/70 [font-size:calc(clamp(2.25rem,8vw,3rem)-2.5pt)]"
-                >
-                  {part.value}
-                </span>
+    <section className="mb-8" aria-label="Household net worth">
+      <div className="overflow-hidden rounded-2xl border border-border bg-surface">
+        <div className="px-6 pb-5 pt-6 sm:px-7">
+          <p className="font-dm-sans text-xs font-medium uppercase tracking-wider text-ink-muted">
+            Household net worth
+          </p>
+
+          <div className="mt-3 flex justify-center">
+            <p
+              className="font-syne inline-flex max-w-full flex-wrap items-baseline justify-center gap-x-1.5 leading-none tracking-tight"
+              aria-live="polite"
+            >
+              {ratesReady ? (
+                <>
+                  <span
+                    className="shrink-0 font-extrabold text-primary/75"
+                    style={{ fontSize: HERO_AUD }}
+                  >
+                    AUD
+                  </span>
+                  <span
+                    className="font-extrabold text-primary tabular-nums"
+                    style={{ fontSize: HERO_AMOUNT }}
+                  >
+                    {formatHeroAmount(Math.round(displayNetWorth))}
+                  </span>
+                </>
               ) : (
                 <span
-                  key={`p-${i}`}
-                  className="text-[clamp(2.25rem,8vw,3rem)] font-extrabold"
+                  className="font-extrabold text-primary"
+                  style={{ fontSize: HERO_AMOUNT }}
                 >
-                  {part.value}
+                  —
                 </span>
-              ),
-            )
-          ) : (
-            <span className="text-[clamp(2.25rem,8vw,3rem)] font-extrabold">—</span>
-          )}
-        </p>
-        {!ratesReady ? (
-          <p className="font-dm-mono mt-2 text-xs text-warning">
-            Waiting for FX rates…
-          </p>
-        ) : null}
-      </div>
+              )}
+            </p>
+          </div>
 
-      <div className="grid gap-2 rounded-xl border border-border bg-surface px-4 py-3">
-        <SubLine label="Liquid" valueAud={liquidAud} ready={ratesReady} />
-        <SubLine label="In deposits" valueAud={depositsAud} ready={ratesReady} />
-        <SubLine label="Super" valueAud={superAud} ready={ratesReady} />
+          {!ratesReady ? (
+            <p className="font-dm-mono mt-2 text-xs text-warning">
+              Waiting for FX rates…
+            </p>
+          ) : null}
+        </div>
+
+        <div className="grid grid-cols-3 divide-x divide-border border-t border-border">
+          <BreakdownCol
+            label="Liquid"
+            valueAud={liquidAud}
+            ready={ratesReady}
+            dotClass="bg-primary"
+          />
+          <BreakdownCol
+            label="In deposits"
+            valueAud={depositsAud}
+            ready={ratesReady}
+            dotClass="bg-accent-gold"
+          />
+          <BreakdownCol
+            label="Super"
+            valueAud={superAud}
+            ready={ratesReady}
+            dotClass="bg-ink-faint"
+          />
+        </div>
       </div>
     </section>
   )
 }
 
 /**
- * @param {{ label: string, valueAud: number, ready: boolean }} props
+ * @param {{
+ *   label: string,
+ *   valueAud: number,
+ *   ready: boolean,
+ *   dotClass: string,
+ * }} props
  */
-function SubLine({ label, valueAud, ready }) {
+function BreakdownCol({ label, valueAud, ready, dotClass }) {
   return (
-    <div className="flex items-baseline justify-between gap-3">
-      <span className="font-dm-sans text-sm text-ink-muted">{label}</span>
-      <span className="font-dm-mono text-sm font-medium tabular-nums text-ink">
+    <div className="flex min-w-0 flex-col items-center px-3 py-4 text-center sm:px-4">
+      <span className="font-dm-mono text-sm font-bold tabular-nums text-ink">
         {ready ? formatMoney(valueAud, 'AUD', { maxFractionDigits: 0 }) : '—'}
+      </span>
+      <span className="font-dm-sans mt-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+        <span
+          className={`inline-block h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`}
+          aria-hidden
+        />
+        <span className="truncate">{label}</span>
       </span>
     </div>
   )

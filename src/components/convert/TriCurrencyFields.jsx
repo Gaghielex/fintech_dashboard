@@ -21,6 +21,34 @@ function formatForActive(amounts, active) {
   return String(r)
 }
 
+/** @type {Record<'AUD'|'JPY'|'USD', { selected: string, focus: string, hint: string }>} */
+const CURRENCY_ACTIVE_STYLES = {
+  AUD: {
+    selected: 'border-primary bg-primary/10 ring-1 ring-primary/30',
+    focus: 'focus:border-primary focus-visible:ring-primary/40',
+    hint: 'text-primary',
+  },
+  JPY: {
+    selected: 'border-accent-gold bg-accent-gold/10 ring-1 ring-accent-gold/35',
+    focus: 'focus:border-accent-gold focus-visible:ring-accent-gold/40',
+    hint: 'text-accent-gold',
+  },
+  USD: {
+    selected: 'border-accent-pink bg-accent-pink/10 ring-1 ring-accent-pink/35',
+    focus: 'focus:border-accent-pink focus-visible:ring-accent-pink/40',
+    hint: 'text-accent-pink',
+  },
+}
+
+/**
+ * @param {'AUD'|'JPY'|'USD'} code
+ * @param {boolean} selected
+ */
+function currencyBlockClass(code, selected) {
+  if (!selected) return 'border-border bg-surface'
+  return CURRENCY_ACTIVE_STYLES[code].selected
+}
+
 /**
  * @param {{
  *   rates: { JPY: number, USD: number } | null,
@@ -136,20 +164,22 @@ function CurrencyBlock({
   onBlur,
   onChange,
 }) {
+  const accent = CURRENCY_ACTIVE_STYLES[/** @type {'AUD'|'JPY'|'USD'} */ (code)]
+  const focusRing = selected ? accent.focus : 'focus-visible:ring-primary/40'
+
   return (
     <motion.div
       layout
-      className={`rounded-xl border px-4 py-3 transition-colors ${
-        selected
-          ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
-          : 'border-border bg-surface'
-      }`}
+      className={`rounded-xl border px-4 py-3 transition-colors ${currencyBlockClass(
+        /** @type {'AUD'|'JPY'|'USD'} */ (code),
+        selected,
+      )}`}
     >
       <div className="flex items-center justify-between gap-3">
         <button
           type="button"
           onClick={onSelect}
-          className="min-w-0 flex-1 text-left outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          className={`min-w-0 flex-1 text-left outline-none focus-visible:ring-2 ${focusRing}`}
         >
           <p className="font-dm-mono text-xs font-semibold uppercase tracking-wider text-ink-muted">
             {code}
@@ -165,13 +195,13 @@ function CurrencyBlock({
               value={local}
               onChange={onChange}
               onBlur={onBlur}
-              className="font-dm-mono w-full max-w-[12rem] rounded-lg border border-border bg-canvas px-2 py-1.5 text-right text-lg font-medium tabular-nums text-ink outline-none focus:border-primary"
+              className={`font-dm-mono w-full max-w-[12rem] rounded-lg border border-border bg-canvas px-2 py-1.5 text-right text-lg font-medium tabular-nums text-ink outline-none focus-visible:ring-2 ${accent.focus}`}
             />
           ) : (
             <button
               type="button"
               onClick={onSelect}
-              className="font-dm-mono w-full max-w-[12rem] rounded-lg border border-transparent py-1.5 text-right text-lg font-medium tabular-nums text-ink outline-none hover:border-border focus-visible:ring-2 focus-visible:ring-primary/40"
+              className={`font-dm-mono w-full max-w-[12rem] rounded-lg border border-transparent py-1.5 text-right text-lg font-medium tabular-nums text-ink outline-none hover:border-border focus-visible:ring-2 ${focusRing}`}
             >
               <AnimatePresence mode="wait" initial={false}>
                 <motion.span
@@ -189,7 +219,11 @@ function CurrencyBlock({
           )}
         </div>
       </div>
-      <p className="font-dm-sans mt-2 text-[10px] text-ink-faint">
+      <p
+        className={`font-dm-sans mt-2 text-[10px] ${
+          selected ? accent.hint : 'text-ink-faint'
+        }`}
+      >
         {selected ? 'Editing · others update live' : 'Tap to edit this currency'}
       </p>
     </motion.div>

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
 import { NavigationContext } from './navigationContext.js'
+import { scrollAppToTop } from '../utils/scrollAppToTop.js'
 
 /**
  * @typedef {{ country: 'AU'|'JP'|'EC'|null, owner: 'gabriel'|'ana'|'joint'|null, retirementOnly: boolean }} AccountsEntry
@@ -26,6 +27,7 @@ export function NavigationProvider({ children }) {
   const goToAccountsDefault = useCallback(() => {
     setAccountsEntry({ ...defaultEntry })
     setTabState('accounts')
+    scrollAppToTop()
   }, [])
 
   const goToAccountsByCountry = useCallback((c) => {
@@ -35,6 +37,7 @@ export function NavigationProvider({ children }) {
       retirementOnly: false,
     })
     setTabState('accounts')
+    scrollAppToTop()
   }, [])
 
   const goToAccountsByOwner = useCallback((o) => {
@@ -44,6 +47,7 @@ export function NavigationProvider({ children }) {
       retirementOnly: false,
     })
     setTabState('accounts')
+    scrollAppToTop()
   }, [])
 
   const goToAccountsRetirement = useCallback(() => {
@@ -53,6 +57,7 @@ export function NavigationProvider({ children }) {
       retirementOnly: true,
     })
     setTabState('accounts')
+    scrollAppToTop()
   }, [])
 
   const value = useMemo(
