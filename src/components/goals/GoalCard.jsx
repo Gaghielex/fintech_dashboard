@@ -124,7 +124,6 @@ export function GoalCard({ goal, liquidAud, ratesReady }) {
           variant={m.surplusVsSchedule >= 0 ? 'positive' : 'negative'}
         />
         <StatChip label="Days remaining" value={chipDays} variant="neutral" />
-        <StatChip label="Due" value={dueLabel} variant="neutral" />
       </div>
     </article>
   )

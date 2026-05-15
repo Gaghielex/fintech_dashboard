@@ -129,7 +129,7 @@ function AccountRow({ account, rates, staleThresholdDays }) {
   const isStale = days != null && days > staleThresholdDays
   const isInactive = st === 'inactive'
   const audAmt = toAud(account, rates)
-  const showNativeAud = account.currency !== 'AUD' && rates?.JPY > 0
+  const showNativeAud = account.currency !== 'AUD' && rates?.JPY > 0 && rates?.USD > 0
   const showRate =
     (t === 'savings' || t === 'term_deposit') && account.interest_rate != null
   const hasDetail =

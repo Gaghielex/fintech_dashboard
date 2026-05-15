@@ -75,10 +75,16 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
           </p>
         </div>
         <p
-          className="font-dm-mono text-right text-[11px] leading-tight text-positive"
+          className="font-dm-mono text-right text-[11px] leading-tight"
           aria-live="polite"
         >
-          Updated now
+          {ratesReady ? (
+            <span className="text-positive">Live rates</span>
+          ) : fx.loading ? (
+            <span className="text-ink-muted">Loading…</span>
+          ) : (
+            <span className="text-warning">Rates unavailable</span>
+          )}
           <br />
           <span className="text-ink-muted">{updatedLabel}</span>
         </p>
