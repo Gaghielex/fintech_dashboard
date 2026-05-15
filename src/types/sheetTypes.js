@@ -11,7 +11,7 @@
  */
 
 /**
- * @typedef {'rodrigo' | 'nat' | 'joint'} OwnerCode
+ * @typedef {'gabriel' | 'ana' | 'joint'} OwnerCode
  */
 
 /**

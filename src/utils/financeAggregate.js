@@ -107,18 +107,18 @@ export function computeHomeMetrics(accounts, settings, rates) {
     r,
     (a) => norm(a.owner) === 'joint' && isInNetWorth(a),
   )
-  const rodrigoOwnAud = sumAud(
+  const gabrielOwnAud = sumAud(
     accounts,
     r,
-    (a) => norm(a.owner) === 'rodrigo' && isInNetWorth(a),
+    (a) => norm(a.owner) === 'gabriel' && isInNetWorth(a),
   )
-  const natOwnAud = sumAud(
+  const anaOwnAud = sumAud(
     accounts,
     r,
-    (a) => norm(a.owner) === 'nat' && isInNetWorth(a),
+    (a) => norm(a.owner) === 'ana' && isInNetWorth(a),
   )
-  const rodrigoAud = rodrigoOwnAud + jointAud
-  const natAud = natOwnAud + jointAud
+  const gabrielAud = gabrielOwnAud + jointAud
+  const anaAud = anaOwnAud + jointAud
 
   /** @type {string | null} */
   let globalLastUpdated = null
@@ -149,8 +149,8 @@ export function computeHomeMetrics(accounts, settings, rates) {
     },
     retirementAud: superAud,
     ownership: {
-      rodrigoAud,
-      natAud,
+      gabrielAud,
+      anaAud,
       jointAud,
     },
     globalLastUpdated,

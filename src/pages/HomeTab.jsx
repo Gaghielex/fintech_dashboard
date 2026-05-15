@@ -59,8 +59,8 @@ export function HomeTab({
       />
 
       <OwnershipSection
-        rodrigoAud={metrics.ownership.rodrigoAud}
-        natAud={metrics.ownership.natAud}
+        gabrielAud={metrics.ownership.gabrielAud}
+        anaAud={metrics.ownership.anaAud}
         jointAud={metrics.ownership.jointAud}
         ratesReady={ratesReady}
       />

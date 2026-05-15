@@ -3,15 +3,15 @@ import { useNavigation } from '../../context/useNavigation.js'
 
 /**
  * @param {{
- *   rodrigoAud: number,
- *   natAud: number,
+ *   gabrielAud: number,
+ *   anaAud: number,
  *   jointAud: number,
  *   ratesReady: boolean,
  * }} props
  */
 export function OwnershipSection({
-  rodrigoAud,
-  natAud,
+  gabrielAud,
+  anaAud,
   jointAud,
   ratesReady,
 }) {
@@ -20,24 +20,20 @@ export function OwnershipSection({
   return (
     <section className="mb-8">
       <h2 className="font-syne mb-3 text-lg font-bold text-ink">Ownership</h2>
-      <p className="font-dm-sans mb-3 text-xs text-ink-muted">
-        Joint balances count in full toward R and N (PRD). The Joint tile is
-        joint-only accounts.
-      </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <OwnerTile
-          label="Rodrigo"
+          label="Gabriel"
           hint="includes joint"
-          amountAud={rodrigoAud}
+          amountAud={gabrielAud}
           ready={ratesReady}
-          onOpen={() => goToAccountsByOwner('rodrigo')}
+          onOpen={() => goToAccountsByOwner('gabriel')}
         />
         <OwnerTile
-          label="Nat"
+          label="Ana"
           hint="includes joint"
-          amountAud={natAud}
+          amountAud={anaAud}
           ready={ratesReady}
-          onOpen={() => goToAccountsByOwner('nat')}
+          onOpen={() => goToAccountsByOwner('ana')}
         />
         <OwnerTile
           label="Joint"

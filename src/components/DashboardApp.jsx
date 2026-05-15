@@ -43,7 +43,13 @@ function DashboardBody({ sheet, fx }) {
       ) : null}
 
       {tab === 'accounts' ? (
-        <AccountsTab loading={sheet.loading} error={sheet.error} />
+        <AccountsTab
+          accounts={accounts}
+          loading={sheet.loading}
+          error={sheet.error}
+          latestRates={latestRates}
+          settings={settings}
+        />
       ) : null}
 
       {tab === 'goals' ? (
