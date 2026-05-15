@@ -327,14 +327,17 @@ function AccountSection({
  */
 export function AccountsTab({ accounts = [], loading, error, latestRates, settings }) {
   const { accountsEntry } = useNavigation()
-  const rates = latestRates ?? { JPY: 0, USD: 0 }
+  const rates = useMemo(
+    () => latestRates ?? { JPY: 0, USD: 0 },
+    [latestRates],
+  )
   const staleThresholdDays = settings?.stale_threshold_days ?? 30
 
   const [activeFilter, setActiveFilter] = useState('all')
   const [groupMode, setGroupMode] = useState('country')
   const [collapsedSections, setCollapsedSections] = useState(() => new Set())
 
-  // Sync entry context → filter and collapse state on each navigation
+  /* eslint-disable react-hooks/set-state-in-effect -- reset filters when Home drill-down context changes */
   useEffect(() => {
     setGroupMode('country')
     if (accountsEntry.owner) {
@@ -352,6 +355,7 @@ export function AccountsTab({ accounts = [], loading, error, latestRates, settin
       setCollapsedSections(new Set())
     }
   }, [accountsEntry])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const toggleSection = useCallback((key) => {
     setCollapsedSections((prev) => {

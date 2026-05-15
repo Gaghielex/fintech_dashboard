@@ -63,7 +63,14 @@ function DashboardBody({ sheet, fx }) {
           loading={sheet.loading}
         />
       ) : null}
-      {tab === 'convert' ? <ConvertTab /> : null}
+      {tab === 'convert' ? (
+        <ConvertTab
+          accounts={accounts}
+          settings={settings}
+          latestRates={latestRates}
+          fx={fx}
+        />
+      ) : null}
     </>
   )
 }
