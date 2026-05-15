@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigation } from '../context/useNavigation.js'
 import { convertToAud } from '../utils/currencyConvert.js'
 import { formatMoney } from '../utils/formatCurrency.js'
+import { getAccountsSheetEditUrl } from '../utils/goalsSheetUrl.js'
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
@@ -358,6 +359,8 @@ function AccountSection({
  *   latestRates: { JPY: number, USD: number } | null,
  *   settings: import('../types/sheetTypes.js').SettingsRow | null,
  *   onRetryLoad?: () => void,
+ *   spreadsheetId?: string,
+ *   sheetGids?: Record<string, number>,
  * }} props
  */
 export function AccountsTab({
@@ -367,6 +370,8 @@ export function AccountsTab({
   latestRates,
   settings,
   onRetryLoad,
+  spreadsheetId,
+  sheetGids,
 }) {
   const { accountsEntry } = useNavigation()
   const rates = useMemo(
@@ -374,6 +379,11 @@ export function AccountsTab({
     [latestRates],
   )
   const staleThresholdDays = settings?.stale_threshold_days ?? 30
+
+  const accountsUrl = useMemo(
+    () => spreadsheetId ? getAccountsSheetEditUrl(spreadsheetId, sheetGids) : null,
+    [spreadsheetId, sheetGids],
+  )
 
   const [activeFilter, setActiveFilter] = useState('all')
   const [groupMode, setGroupMode] = useState('country')
@@ -657,6 +667,23 @@ export function AccountsTab({
           ))}
         </div>
       )}
+
+      <div className="pt-2">
+        {accountsUrl ? (
+          <a
+            href={accountsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-dm-sans flex w-full items-center justify-center rounded-xl bg-primary py-3 text-center text-sm font-semibold text-canvas transition hover:opacity-90"
+          >
+            Update accounts in Google Sheets
+          </a>
+        ) : (
+          <p className="font-dm-sans text-center text-xs text-ink-faint">
+            Set VITE_SHEET_ID to enable the sheet link.
+          </p>
+        )}
+      </div>
     </div>
   )
 }

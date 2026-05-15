@@ -63,6 +63,8 @@ function DashboardBody({ sheet, fx }) {
           latestRates={latestRates}
           settings={settings}
           onRetryLoad={sheet.refetch}
+          spreadsheetId={import.meta.env.VITE_SHEET_ID}
+          sheetGids={sheet.data?.sheetGids}
         />
       ) : null}
 
