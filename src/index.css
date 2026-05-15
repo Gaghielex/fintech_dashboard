@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+/*
+  Design tokens — Personal Finance Position Dashboard (PRD v1).
+  --palette-* on :root is the source of truth; @theme maps to Tailwind colour utilities.
+*/
+
+:root {
+  --palette-canvas: #0d1117;
+  --palette-surface: #161b22;
+  --palette-surface-1: #21262d;
+  --palette-border: #30363d;
+  --palette-primary: #00c896;
+  --palette-accent-gold: #f0c419;
+  --palette-text-primary: #e6edf3;
+  --palette-text-secondary: #8b949e;
+  --palette-text-tertiary: #484f58;
+  --palette-positive: #3fb950;
+  --palette-warning: #d29922;
+  --palette-negative: #e24b4a;
+
+  --theme-color: var(--palette-canvas);
+}
+
+@theme inline {
+  --font-syne: 'Syne', ui-sans-serif, system-ui, sans-serif;
+  --font-dm-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-dm-mono: 'DM Mono', ui-monospace, monospace;
+
+  --color-canvas: var(--palette-canvas);
+  --color-surface: var(--palette-surface);
+  --color-surface-1: var(--palette-surface-1);
+  --color-border: var(--palette-border);
+  --color-primary: var(--palette-primary);
+  --color-accent-gold: var(--palette-accent-gold);
+  /* PRD text tiers → utilities text-ink, text-ink-muted, text-ink-faint */
+  --color-ink: var(--palette-text-primary);
+  --color-ink-muted: var(--palette-text-secondary);
+  --color-ink-faint: var(--palette-text-tertiary);
+  --color-positive: var(--palette-positive);
+  --color-warning: var(--palette-warning);
+  --color-negative: var(--palette-negative);
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    background-color: var(--palette-canvas);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: var(--font-dm-sans);
+    font-weight: 400;
+    color: var(--palette-text-primary);
+    background-color: var(--palette-canvas);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100dvh;
+  }
+}
