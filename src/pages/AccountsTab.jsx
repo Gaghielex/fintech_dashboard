@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useNavigation } from '../context/useNavigation.js'
 import { convertToAud } from '../utils/currencyConvert.js'
 import { formatMoney } from '../utils/formatCurrency.js'
@@ -193,38 +194,49 @@ function AccountRow({ account, rates, staleThresholdDays }) {
         )}
       </button>
 
-      {open && hasDetail && (
-        <div className="border-t border-border/30 bg-canvas px-4 pb-4 pt-3">
-          <dl className="font-dm-mono space-y-1.5 text-xs">
-            {showRate && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-ink-muted">Interest rate</dt>
-                <dd className="text-ink">{account.interest_rate}% p.a.</dd>
-              </div>
-            )}
-            {account.maturity_date && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-ink-muted">Maturity date</dt>
-                <dd className="text-ink">{fmtDate(account.maturity_date)}</dd>
-              </div>
-            )}
-            {account.last_updated && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-ink-muted">Last updated</dt>
-                <dd className={isStale ? 'text-warning' : 'text-ink'}>
-                  {fmtDate(account.last_updated)}
-                </dd>
-              </div>
-            )}
-            {account.notes && (
-              <div className="flex justify-between gap-4">
-                <dt className="text-ink-muted">Notes</dt>
-                <dd className="max-w-[65%] text-right text-ink">{account.notes}</dd>
-              </div>
-            )}
-          </dl>
-        </div>
-      )}
+      <AnimatePresence initial={false}>
+        {open && hasDetail && (
+          <motion.div
+            key="detail"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="border-t border-border/30 bg-canvas px-4 pb-4 pt-3">
+              <dl className="font-dm-mono space-y-1.5 text-xs">
+                {showRate && (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-ink-muted">Interest rate</dt>
+                    <dd className="text-ink">{account.interest_rate}% p.a.</dd>
+                  </div>
+                )}
+                {account.maturity_date && (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-ink-muted">Maturity date</dt>
+                    <dd className="text-ink">{fmtDate(account.maturity_date)}</dd>
+                  </div>
+                )}
+                {account.last_updated && (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-ink-muted">Last updated</dt>
+                    <dd className={isStale ? 'text-warning' : 'text-ink'}>
+                      {fmtDate(account.last_updated)}
+                    </dd>
+                  </div>
+                )}
+                {account.notes && (
+                  <div className="flex justify-between gap-4">
+                    <dt className="text-ink-muted">Notes</dt>
+                    <dd className="max-w-[65%] text-right text-ink">{account.notes}</dd>
+                  </div>
+                )}
+              </dl>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -1,5 +1,14 @@
+import { motion } from 'framer-motion'
 import { formatMoney } from '../../utils/formatCurrency.js'
 import { useNavigation } from '../../context/useNavigation.js'
+
+function IconChevronRight() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden className="shrink-0 text-ink-faint">
+      <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
 
 /**
  * @param {{
@@ -52,16 +61,21 @@ export function OwnershipSection({
  */
 function OwnerTile({ label, hint, amountAud, ready, onOpen }) {
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onOpen}
-      className="rounded-xl border border-border bg-surface p-4 text-left outline-none transition hover:bg-surface-1/80 focus-visible:ring-2 focus-visible:ring-primary/40"
+      whileTap={{ opacity: 0.72, scale: 0.98 }}
+      transition={{ duration: 0.1 }}
+      className="rounded-xl border border-border bg-surface p-4 text-left outline-none transition-colors hover:bg-surface-1/80 focus-visible:ring-2 focus-visible:ring-primary/40"
     >
-      <p className="font-syne text-base font-bold text-ink">{label}</p>
+      <div className="flex items-start justify-between gap-1">
+        <p className="font-syne text-base font-bold text-ink">{label}</p>
+        <IconChevronRight />
+      </div>
       <p className="font-dm-sans text-[10px] text-ink-faint">{hint}</p>
       <p className="font-dm-mono mt-3 text-lg font-medium tabular-nums text-ink">
         {ready ? formatMoney(amountAud, 'AUD') : '—'}
       </p>
-    </button>
+    </motion.button>
   )
 }
