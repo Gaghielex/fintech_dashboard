@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { formatMoney } from '../../utils/formatCurrency.js'
 import { recalcTriFromActive } from '../../utils/triCurrencyConvert.js'
 
@@ -64,6 +65,7 @@ export function TriCurrencyFields({
         isEditor={active === 'AUD'}
         local={local}
         display={formatMoney(amounts.aud, 'AUD')}
+        activeKey={active}
         onBlur={() => applyParsed(local)}
         onChange={(e) => {
           setLocal(e.target.value)
@@ -79,6 +81,7 @@ export function TriCurrencyFields({
         isEditor={active === 'JPY'}
         local={local}
         display={formatMoney(amounts.jpy, 'JPY')}
+        activeKey={active}
         onBlur={() => applyParsed(local)}
         onChange={(e) => {
           setLocal(e.target.value)
@@ -94,6 +97,7 @@ export function TriCurrencyFields({
         isEditor={active === 'USD'}
         local={local}
         display={formatMoney(amounts.usd, 'USD', { maxFractionDigits: 4 })}
+        activeKey={active}
         onBlur={() => applyParsed(local)}
         onChange={(e) => {
           setLocal(e.target.value)
@@ -114,6 +118,7 @@ export function TriCurrencyFields({
  *   isEditor: boolean,
  *   local: string,
  *   display: string,
+ *   activeKey: string,
  *   onBlur: () => void,
  *   onChange: (e: import('react').ChangeEvent<HTMLInputElement>) => void,
  * }} props
@@ -127,12 +132,14 @@ function CurrencyBlock({
   isEditor,
   local,
   display,
+  activeKey,
   onBlur,
   onChange,
 }) {
   return (
-    <div
-      className={`rounded-xl border px-4 py-3 transition ${
+    <motion.div
+      layout
+      className={`rounded-xl border px-4 py-3 transition-colors ${
         selected
           ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
           : 'border-border bg-surface'
@@ -166,7 +173,18 @@ function CurrencyBlock({
               onClick={onSelect}
               className="font-dm-mono w-full max-w-[12rem] rounded-lg border border-transparent py-1.5 text-right text-lg font-medium tabular-nums text-ink outline-none hover:border-border focus-visible:ring-2 focus-visible:ring-primary/40"
             >
-              {ratesReady ? display : '—'}
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={`${code}-${activeKey}`}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  className="inline-block"
+                >
+                  {ratesReady ? display : '—'}
+                </motion.span>
+              </AnimatePresence>
             </button>
           )}
         </div>
@@ -174,6 +192,6 @@ function CurrencyBlock({
       <p className="font-dm-sans mt-2 text-[10px] text-ink-faint">
         {selected ? 'Editing · others update live' : 'Tap to edit this currency'}
       </p>
-    </div>
+    </motion.div>
   )
 }

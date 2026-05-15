@@ -1,4 +1,5 @@
 import { formatMoney } from '../../utils/formatCurrency.js'
+import { useCountUp } from '../../hooks/useCountUp.js'
 
 /**
  * @param {{
@@ -16,6 +17,8 @@ export function HomeHeroSection({
   superAud,
   ratesReady,
 }) {
+  const displayNetWorth = useCountUp(netWorthAud, ratesReady)
+
   return (
     <section className="mb-8 space-y-4">
       <div>
@@ -27,7 +30,7 @@ export function HomeHeroSection({
           aria-live="polite"
         >
           {ratesReady
-            ? formatMoney(netWorthAud, 'AUD', { maxFractionDigits: 0 })
+            ? formatMoney(displayNetWorth, 'AUD', { maxFractionDigits: 0 })
             : '—'}
         </p>
         {!ratesReady ? (

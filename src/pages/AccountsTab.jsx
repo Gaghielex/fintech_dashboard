@@ -137,7 +137,7 @@ function AccountRow({ account, rates, staleThresholdDays }) {
 
   return (
     <div
-      className={`border-t border-border/40 ${isInactive ? 'opacity-40' : isStale ? 'opacity-55' : ''}`}
+      className={`border-t border-border/40 ${isInactive ? 'opacity-40' : isStale ? 'border-l-2 border-l-warning/60' : ''}`}
     >
       <button
         type="button"
@@ -156,7 +156,7 @@ function AccountRow({ account, rates, staleThresholdDays }) {
               </span>
             )}
             {isStale && (
-              <span className="font-dm-mono shrink-0 text-[10px] text-warning">
+              <span className="font-dm-mono animate-pulse shrink-0 text-[10px] text-warning">
                 🕐 {days}d ago
               </span>
             )}

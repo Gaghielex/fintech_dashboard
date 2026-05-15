@@ -84,7 +84,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-surface/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 backdrop-blur-md lg:hidden"
       aria-label="Main"
     >
       <div className="mx-auto flex max-w-lg items-stretch justify-around px-2">
