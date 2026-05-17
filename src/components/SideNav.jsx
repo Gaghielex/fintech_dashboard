@@ -70,7 +70,7 @@ export function SideNav() {
       {/* Brand */}
       <div className="flex h-16 items-center gap-2.5 px-5 border-b border-border">
         <span className="font-syne text-base font-extrabold tracking-tight text-ink">
-          FinTrack
+          Doggo Finance
         </span>
       </div>
 
