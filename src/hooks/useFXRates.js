@@ -11,7 +11,7 @@ import { FX_CACHE_STORAGE_KEY } from '../utils/storageKeys.js'
  * @typedef {{
  *   date: string,
  *   base: string,
- *   rates: { JPY: number, USD: number }
+ *   rates: { JPY: number, USD: number, EUR: number }
  * }} FxLatest
  */
 
@@ -19,7 +19,7 @@ import { FX_CACHE_STORAGE_KEY } from '../utils/storageKeys.js'
  * @typedef {{
  *   startDate: string,
  *   endDate: string,
- *   points: { date: string, JPY: number, USD: number }[]
+ *   points: { date: string, JPY: number, USD: number, EUR: number }[]
  * }} FxHistory
  */
 
@@ -94,6 +94,7 @@ export function useFXRates() {
           rates: {
             JPY: Number(lat.rates?.JPY ?? 0),
             USD: Number(lat.rates?.USD ?? 0),
+            EUR: Number(lat.rates?.EUR ?? 0),
           },
         }
         const points = timeSeriesToSortedPoints(hist)

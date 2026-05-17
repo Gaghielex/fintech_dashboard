@@ -3,7 +3,7 @@
  */
 
 /**
- * @typedef {'AUD' | 'JPY' | 'USD'} CurrencyCode
+ * @typedef {'AUD' | 'JPY' | 'USD' | 'EUR'} CurrencyCode
  */
 
 /**

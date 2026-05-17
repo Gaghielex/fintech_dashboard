@@ -7,7 +7,7 @@ export function formatMoney(amount, currency, opts = {}) {
   const ccy = String(currency || 'AUD').toUpperCase()
   const max =
     opts.maxFractionDigits ??
-    (ccy === 'JPY' ? 0 : ccy === 'USD' ? 2 : 0)
+    (ccy === 'JPY' ? 0 : (ccy === 'USD' || ccy === 'EUR') ? 2 : 0)
   const min = opts.minFractionDigits ?? 0
   try {
     return new Intl.NumberFormat('en-AU', {
@@ -33,7 +33,7 @@ export function formatMoneyParts(amount, currency, opts = {}) {
   const ccy = String(currency || 'AUD').toUpperCase()
   const max =
     opts.maxFractionDigits ??
-    (ccy === 'JPY' ? 0 : ccy === 'USD' ? 2 : 0)
+    (ccy === 'JPY' ? 0 : (ccy === 'USD' || ccy === 'EUR') ? 2 : 0)
   const min = opts.minFractionDigits ?? 0
   try {
     return new Intl.NumberFormat('en-AU', {

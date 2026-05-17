@@ -1,6 +1,6 @@
 /**
- * Frankfurter `latest` shape: JPY and USD **per 1 AUD**.
- * @typedef {{ JPY: number, USD: number }} AudQuoteRates
+ * Frankfurter `latest` shape: JPY, USD, and EUR **per 1 AUD**.
+ * @typedef {{ JPY: number, USD: number, EUR: number }} AudQuoteRates
  */
 
 /**
@@ -15,6 +15,7 @@ export function convertToAud(amount, currency, rates) {
   if (ccy === 'AUD') return amount
   if (ccy === 'JPY') return amount / rates.JPY
   if (ccy === 'USD') return amount / rates.USD
+  if (ccy === 'EUR') return rates.EUR > 0 ? amount / rates.EUR : 0
   return amount
 }
 
@@ -30,6 +31,7 @@ export function convertFromAud(amountAud, currency, rates) {
   if (ccy === 'AUD') return amountAud
   if (ccy === 'JPY') return amountAud * rates.JPY
   if (ccy === 'USD') return amountAud * rates.USD
+  if (ccy === 'EUR') return amountAud * rates.EUR
   return amountAud
 }
 

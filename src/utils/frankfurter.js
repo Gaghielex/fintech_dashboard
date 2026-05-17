@@ -21,7 +21,7 @@ function formatIsoDate(d) {
 }
 
 /**
- * @typedef {{ amount: number, base: string, date: string, rates: { JPY?: number, USD?: number } }} FrankfurterLatest
+ * @typedef {{ amount: number, base: string, date: string, rates: { JPY?: number, USD?: number, EUR?: number } }} FrankfurterLatest
  */
 
 /**
@@ -30,7 +30,7 @@ function formatIsoDate(d) {
  *   base: string,
  *   start_date: string,
  *   end_date: string,
- *   rates: Record<string, { JPY?: number, USD?: number }>
+ *   rates: Record<string, { JPY?: number, USD?: number, EUR?: number }>
  * }} FrankfurterTimeSeries
  */
 
@@ -38,7 +38,7 @@ function formatIsoDate(d) {
  * @returns {Promise<FrankfurterLatest>}
  */
 export async function fetchLatestAudRates() {
-  const res = await fetch(`${FRANKFURTER}/latest?from=AUD&to=JPY,USD`)
+  const res = await fetch(`${FRANKFURTER}/latest?from=AUD&to=JPY,USD,EUR`)
   if (!res.ok) throw new Error(`Frankfurter latest ${res.status}`)
   return res.json()
 }
@@ -50,7 +50,7 @@ export async function fetchLatestAudRates() {
  */
 export async function fetchAudHistory(fromIso, toIso) {
   const res = await fetch(
-    `${FRANKFURTER}/${fromIso}..${toIso}?from=AUD&to=JPY,USD`,
+    `${FRANKFURTER}/${fromIso}..${toIso}?from=AUD&to=JPY,USD,EUR`,
   )
   if (!res.ok) throw new Error(`Frankfurter history ${res.status}`)
   return res.json()
