@@ -46,7 +46,7 @@ export function HomeTab({
   )
 
   return (
-    <motion.div className="relative -mt-4 lg:-mt-8 flex min-h-[calc(100dvh-5.5rem)] flex-col lg:mt-0">
+    <motion.div className="relative -mt-4 lg:-mt-8 flex min-h-[calc(100dvh-5.5rem)] flex-col">
       <HomeHeroImage />
 
       <motion.div

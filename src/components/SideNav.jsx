@@ -69,7 +69,7 @@ export function SideNav() {
     <aside className="hidden lg:flex lg:w-56 lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:border-r lg:border-border lg:bg-surface/95 lg:backdrop-blur-md">
       {/* Brand */}
       <div className="flex h-16 items-center gap-2.5 px-5 border-b border-border">
-        <span className="font-syne text-base font-extrabold tracking-tight text-ink">
+        <span className="font-syne text-sm font-extrabold tracking-tight text-ink whitespace-nowrap">
           Doggo Finance
         </span>
       </div>

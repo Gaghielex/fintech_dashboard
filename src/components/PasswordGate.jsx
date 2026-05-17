@@ -54,7 +54,7 @@ export function PasswordGate({ children }) {
       <div className="w-full max-w-sm space-y-6 rounded-xl border border-border bg-surface p-6 shadow-lg">
         <div className="space-y-1 text-center">
           <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
-            Household
+            Doggo Finance
           </h1>
           <p className="font-dm-sans text-sm text-ink-muted">
             Enter the shared password to continue.
