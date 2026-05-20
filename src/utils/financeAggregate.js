@@ -41,7 +41,9 @@ export function isInLiquid(a) {
   if (isSuper(a) || isInactive(a)) return false
   const t = norm(a.type)
   const st = norm(a.status)
-  if (t === 'transaction' || t === 'savings') return st === 'active'
+  if (t === 'cash' || t === 'transaction' || t === 'savings') {
+    return st === 'active'
+  }
   if (t === 'term_deposit') {
     return st === 'matured' || st === 'pending_renewal'
   }

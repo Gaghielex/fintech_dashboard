@@ -15,8 +15,9 @@ const COUNTRY_META = {
   EC: { label: 'Ecuador', flag: '🇪🇨', native: 'USD' },
 }
 
-const TYPE_ORDER = ['transaction', 'savings', 'term_deposit', 'super', 'other']
+const TYPE_ORDER = ['cash', 'transaction', 'savings', 'term_deposit', 'super', 'other']
 const TYPE_LABEL = {
+  cash: 'Cash',
   transaction: 'Transaction',
   savings: 'Savings',
   term_deposit: 'Term deposit',

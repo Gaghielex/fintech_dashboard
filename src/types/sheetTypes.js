@@ -7,7 +7,7 @@
  */
 
 /**
- * @typedef {'transaction' | 'savings' | 'term_deposit' | 'super' | 'other'} AccountType
+ * @typedef {'cash' | 'transaction' | 'savings' | 'term_deposit' | 'super' | 'other'} AccountType
  */
 
 /**
