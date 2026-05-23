@@ -684,7 +684,7 @@ export function AccountsTab({
           autoComplete="off"
           autoCorrect="off"
           spellCheck={false}
-          className="font-dm-sans w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink-faint focus:border-primary focus:outline-none"
+          className="font-dm-sans w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-9 text-base text-ink placeholder:text-ink-faint focus:border-primary focus:outline-none"
         />
         {searchQuery ? (
           <button

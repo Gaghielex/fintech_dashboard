@@ -28,21 +28,9 @@ export function FreshnessBar({
   }
 
   return (
-    <footer
-      className={`mt-auto rounded-xl border px-4 py-3 ${
-        stale
-          ? 'border-warning/70 bg-warning/10'
-          : 'border-border bg-surface'
-      }`}
-    >
-      <p
-        className={`font-dm-mono text-xs leading-relaxed ${
-          stale ? 'text-warning' : 'text-ink-muted'
-        }`}
-      >
-        <span
-          className={`font-dm-sans font-semibold ${stale ? 'text-warning' : 'text-ink'}`}
-        >
+    <footer className="mt-auto rounded-xl border border-white/10 bg-gradient-to-r from-violet-500/25 via-pink-500/20 to-orange-400/25 px-4 py-3">
+      <p className={`font-dm-mono text-xs leading-relaxed ${stale ? 'text-orange-200' : 'text-white/70'}`}>
+        <span className={`font-dm-sans font-semibold ${stale ? 'text-orange-100' : 'text-white/90'}`}>
           Data freshness
         </span>
         <br />
@@ -50,7 +38,7 @@ export function FreshnessBar({
         {fxDateLabel ? (
           <>
             <br />
-            <span className="text-ink-faint">FX: {fxDateLabel}</span>
+            <span className="text-white/50">FX: {fxDateLabel}</span>
           </>
         ) : null}
       </p>

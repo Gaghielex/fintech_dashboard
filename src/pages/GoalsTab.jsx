@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from 'react'
+import { useMemo, useState, useCallback, useRef } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
 import { computeGoalsLiquidAud } from '../utils/financeAggregate.js'
 import { computeGoalsLiquidAllocation } from '../utils/goalProgress.js'
@@ -21,10 +21,66 @@ function applyStoredOrder(goals, storedIds) {
   return [...ordered, ...newGoals]
 }
 
-function DraggableGoalCard({ goal, allocatedAud, ratesReady }) {
+function DraggableGoalCard({ goal, allocatedAud, ratesReady, onReorderStart, onReorderEnd }) {
   const controls = useDragControls()
+  const [isDragging, setIsDragging] = useState(false)
+  const timerRef = useRef(null)
+  const savedEvent = useRef(null)
+  const startPos = useRef(null)
+
+  const cancelTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }
+
+  const activate = () => {
+    setIsDragging(true)
+    onReorderStart()
+    controls.start(savedEvent.current)
+  }
+
+  const deactivate = () => {
+    setIsDragging(false)
+    onReorderEnd()
+  }
+
+  const handlePointerDown = (e) => {
+    savedEvent.current = e
+    startPos.current = { x: e.clientX, y: e.clientY }
+    timerRef.current = setTimeout(() => {
+      timerRef.current = null
+      activate()
+    }, 2000)
+  }
+
+  const handlePointerMove = (e) => {
+    if (!timerRef.current || !startPos.current) return
+    const dx = e.clientX - startPos.current.x
+    const dy = e.clientY - startPos.current.y
+    if (Math.sqrt(dx * dx + dy * dy) > 8) cancelTimer()
+  }
+
+  const handlePointerUp = () => {
+    cancelTimer()
+    deactivate()
+  }
+
+  const handleDragEnd = () => deactivate()
+
   return (
-    <Reorder.Item as="div" value={goal} dragListener={false} dragControls={controls}>
+    <Reorder.Item
+      as="div"
+      value={goal}
+      dragListener={false}
+      dragControls={controls}
+      onDragEnd={handleDragEnd}
+      style={{
+        opacity: isDragging ? 0.55 : 1,
+        transition: 'opacity 0.2s ease',
+      }}
+    >
       <GoalCard
         goal={goal}
         allocatedAud={allocatedAud}
@@ -33,7 +89,10 @@ function DraggableGoalCard({ goal, allocatedAud, ratesReady }) {
           <button
             type="button"
             aria-label="Drag to reorder"
-            onPointerDown={(e) => controls.start(e)}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
             className="absolute inset-x-0 top-0 flex cursor-grab justify-center pt-2.5 touch-none active:cursor-grabbing"
           >
             <div className="h-[3px] w-10 rounded-full bg-ink-faint/50" />
@@ -73,6 +132,8 @@ export function GoalsTab({
     latestRates && latestRates.JPY > 0 && latestRates.USD > 0,
   )
 
+  const [anyReordering, setAnyReordering] = useState(false)
+
   const [customOrder, setCustomOrder] = useState(() => {
     try {
       const stored = localStorage.getItem(GOAL_ORDER_KEY)
@@ -98,14 +159,6 @@ export function GoalsTab({
     localStorage.setItem(GOAL_ORDER_KEY, JSON.stringify(ids))
   }, [])
 
-  const [bannerDismissed, setBannerDismissed] = useState(
-    () => localStorage.getItem('goals_readonly_dismissed') === 'true',
-  )
-  const dismissBanner = () => {
-    localStorage.setItem('goals_readonly_dismissed', 'true')
-    setBannerDismissed(true)
-  }
-
   const goalsUrl = useMemo(
     () =>
       spreadsheetId
@@ -122,24 +175,6 @@ export function GoalsTab({
         </h1>
       </header>
 
-      {!bannerDismissed && (
-        <div className="flex items-start justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
-          <p className="font-dm-sans text-sm text-ink-muted">
-            Read-only view — edit amounts and dates in Google Sheets.
-          </p>
-          <button
-            type="button"
-            onClick={dismissBanner}
-            aria-label="Dismiss"
-            className="mt-0.5 shrink-0 text-ink-faint transition hover:text-ink"
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
-      )}
-
       <GoalsLiquidStrip
         liquidAud={liquidAud}
         ratesReady={ratesReady}
@@ -149,7 +184,18 @@ export function GoalsTab({
       />
 
       <section>
-        <h2 className="font-syne mb-4 text-base font-bold text-ink">Your goals</h2>
+        <div className="mb-4">
+          <h2 className="font-syne text-base font-bold text-ink">Your goals</h2>
+          {anyReordering && (
+            <p className="font-dm-sans mt-1 flex items-center gap-1 text-xs text-ink-muted">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M12 11v5M12 8h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              Prioritize your goals by reordering them
+            </p>
+          )}
+        </div>
         {!goals.length ? (
           <p className="font-dm-sans rounded-xl border border-dashed border-border bg-surface/60 px-4 py-6 text-center text-sm text-ink-muted">
             No rows on the <span className="font-dm-mono">Goals</span> tab yet.
@@ -169,6 +215,8 @@ export function GoalsTab({
                 goal={g}
                 allocatedAud={goalAllocations[idx] ?? 0}
                 ratesReady={ratesReady}
+                onReorderStart={() => setAnyReordering(true)}
+                onReorderEnd={() => setAnyReordering(false)}
               />
             ))}
           </Reorder.Group>

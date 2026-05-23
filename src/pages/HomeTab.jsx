@@ -74,7 +74,7 @@ export function HomeTab({
       />
 
       <HomeHeroGlassLayer>
-        <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible" className="mb-4">
+        <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible">
           <UpdateReminderBanner
             globalLastUpdated={metrics.globalLastUpdated}
             spreadsheetId={spreadsheetId}

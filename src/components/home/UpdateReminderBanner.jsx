@@ -43,7 +43,7 @@ export function UpdateReminderBanner({ globalLastUpdated, spreadsheetId, sheetGi
   }
 
   return (
-    <div className="rounded-2xl bg-white px-5 pt-4 pb-5 shadow-xl shadow-black/25">
+    <div className="mb-4 rounded-2xl bg-white px-5 pt-4 pb-5 shadow-xl shadow-black/25">
       <div className="flex items-start justify-between gap-2">
         <h2 className="font-syne flex items-center gap-2 text-xl font-extrabold leading-tight text-gray-900">
           It's time to update<br />your balances
