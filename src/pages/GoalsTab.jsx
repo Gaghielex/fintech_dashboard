@@ -1,9 +1,48 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useCallback } from 'react'
+import { Reorder, useDragControls } from 'framer-motion'
 import { computeGoalsLiquidAud } from '../utils/financeAggregate.js'
 import { computeGoalsLiquidAllocation } from '../utils/goalProgress.js'
 import { getGoalsSheetEditUrl } from '../utils/goalsSheetUrl.js'
 import { GoalsLiquidStrip } from '../components/goals/GoalsLiquidStrip.jsx'
 import { GoalCard } from '../components/goals/GoalCard.jsx'
+
+const GOAL_ORDER_KEY = 'goal_order'
+
+function goalKey(g) {
+  return g.id ? String(g.id) : (g.goal_name ?? '')
+}
+
+function applyStoredOrder(goals, storedIds) {
+  if (!storedIds) return goals
+  const idToGoal = new Map(goals.map((g) => [goalKey(g), g]))
+  const ordered = storedIds.filter((id) => idToGoal.has(id)).map((id) => idToGoal.get(id))
+  const storedSet = new Set(storedIds)
+  const newGoals = goals.filter((g) => !storedSet.has(goalKey(g)))
+  return [...ordered, ...newGoals]
+}
+
+function DraggableGoalCard({ goal, allocatedAud, ratesReady }) {
+  const controls = useDragControls()
+  return (
+    <Reorder.Item as="div" value={goal} dragListener={false} dragControls={controls}>
+      <GoalCard
+        goal={goal}
+        allocatedAud={allocatedAud}
+        ratesReady={ratesReady}
+        dragHandle={
+          <button
+            type="button"
+            aria-label="Drag to reorder"
+            onPointerDown={(e) => controls.start(e)}
+            className="absolute inset-x-0 top-0 flex cursor-grab justify-center pt-2.5 touch-none active:cursor-grabbing"
+          >
+            <div className="h-[3px] w-10 rounded-full bg-ink-faint/50" />
+          </button>
+        }
+      />
+    </Reorder.Item>
+  )
+}
 
 /**
  * @param {{
@@ -26,19 +65,38 @@ export function GoalsTab({
   const [upSaversOnly, setUpSaversOnly] = useState(true)
 
   const liquidAud = useMemo(
-    () =>
-      computeGoalsLiquidAud(accounts, latestRates, { upSaversOnly }),
+    () => computeGoalsLiquidAud(accounts, latestRates, { upSaversOnly }),
     [accounts, latestRates, upSaversOnly],
-  )
-
-  const goalAllocations = useMemo(
-    () => computeGoalsLiquidAllocation(goals, liquidAud),
-    [goals, liquidAud],
   )
 
   const ratesReady = Boolean(
     latestRates && latestRates.JPY > 0 && latestRates.USD > 0,
   )
+
+  const [customOrder, setCustomOrder] = useState(() => {
+    try {
+      const stored = localStorage.getItem(GOAL_ORDER_KEY)
+      return stored ? JSON.parse(stored) : null
+    } catch {
+      return null
+    }
+  })
+
+  const orderedGoals = useMemo(
+    () => applyStoredOrder(goals, customOrder),
+    [goals, customOrder],
+  )
+
+  const goalAllocations = useMemo(
+    () => computeGoalsLiquidAllocation(orderedGoals, liquidAud),
+    [orderedGoals, liquidAud],
+  )
+
+  const handleReorder = useCallback((newGoals) => {
+    const ids = newGoals.map(goalKey)
+    setCustomOrder(ids)
+    localStorage.setItem(GOAL_ORDER_KEY, JSON.stringify(ids))
+  }, [])
 
   const [bannerDismissed, setBannerDismissed] = useState(
     () => localStorage.getItem('goals_readonly_dismissed') === 'true',
@@ -90,22 +148,30 @@ export function GoalsTab({
         onUpSaversOnlyChange={setUpSaversOnly}
       />
 
-      <section className="space-y-4">
-        <h2 className="font-syne text-base font-bold text-ink">Your goals</h2>
+      <section>
+        <h2 className="font-syne mb-4 text-base font-bold text-ink">Your goals</h2>
         {!goals.length ? (
           <p className="font-dm-sans rounded-xl border border-dashed border-border bg-surface/60 px-4 py-6 text-center text-sm text-ink-muted">
             No rows on the <span className="font-dm-mono">Goals</span> tab yet.
             Use <span className="font-semibold text-ink">Add a goal</span> below.
           </p>
         ) : (
-          goals.map((g, idx) => (
-            <GoalCard
-              key={g.id ? String(g.id) : `goal-${idx}`}
-              goal={g}
-              allocatedAud={goalAllocations[idx] ?? 0}
-              ratesReady={ratesReady}
-            />
-          ))
+          <Reorder.Group
+            as="div"
+            axis="y"
+            values={orderedGoals}
+            onReorder={handleReorder}
+            className="space-y-4"
+          >
+            {orderedGoals.map((g, idx) => (
+              <DraggableGoalCard
+                key={goalKey(g) || `goal-${idx}`}
+                goal={g}
+                allocatedAud={goalAllocations[idx] ?? 0}
+                ratesReady={ratesReady}
+              />
+            ))}
+          </Reorder.Group>
         )}
       </section>
 

@@ -5,6 +5,7 @@ import { HomeHeader } from '../components/home/HomeHeader.jsx'
 import { HomeHeroImage, HOME_HERO_SPACER, HomeHeroGlassLayer } from '../components/home/HomeHeroImage.jsx'
 import { HomeHeroSection } from '../components/home/HomeHeroSection.jsx'
 import { GeographySection } from '../components/home/GeographySection.jsx'
+import { UpdateReminderBanner } from '../components/home/UpdateReminderBanner.jsx'
 import { OwnershipSection } from '../components/home/OwnershipSection.jsx'
 import { FreshnessBar } from '../components/home/FreshnessBar.jsx'
 import { AddToHomeScreenBanner } from '../components/home/AddToHomeScreenBanner.jsx'
@@ -26,6 +27,10 @@ const fadeUp = {
  *   fxDateLabel: string | null,
  *   fxFromCache: boolean,
  *   fxRatesCachedAt: string | null,
+ *   numbersVisible: boolean,
+ *   onToggleNumbers: () => void,
+ *   spreadsheetId: string | undefined,
+ *   sheetGids: Record<string, number> | undefined,
  * }} props
  */
 export function HomeTab({
@@ -35,6 +40,10 @@ export function HomeTab({
   fxDateLabel,
   fxFromCache,
   fxRatesCachedAt,
+  numbersVisible,
+  onToggleNumbers,
+  spreadsheetId,
+  sheetGids,
 }) {
   const metrics = useMemo(
     () => computeHomeMetrics(accounts, settings, latestRates),
@@ -43,6 +52,11 @@ export function HomeTab({
 
   const ratesReady = Boolean(
     latestRates && latestRates.JPY > 0 && latestRates.USD > 0,
+  )
+
+  const retirementIconUrl = useMemo(
+    () => accounts.find((a) => String(a.type).toLowerCase() === 'super')?.icon_url ?? null,
+    [accounts],
   )
 
   return (
@@ -60,6 +74,14 @@ export function HomeTab({
       />
 
       <HomeHeroGlassLayer>
+        <motion.div custom={0} variants={fadeUp} initial="hidden" animate="visible" className="mb-4">
+          <UpdateReminderBanner
+            globalLastUpdated={metrics.globalLastUpdated}
+            spreadsheetId={spreadsheetId}
+            sheetGids={sheetGids}
+          />
+        </motion.div>
+
         <motion.div custom={1} variants={fadeUp} initial="hidden" animate="visible">
           <HomeHeader />
         </motion.div>
@@ -77,6 +99,8 @@ export function HomeTab({
             depositsAud={metrics.depositsAud}
             superAud={metrics.superAud}
             ratesReady={ratesReady}
+            numbersVisible={numbersVisible}
+            onToggleNumbers={onToggleNumbers}
           />
         </motion.div>
 
@@ -86,6 +110,7 @@ export function HomeTab({
             retirementAud={metrics.retirementAud}
             rates={latestRates ?? { JPY: 0, USD: 0 }}
             ratesReady={ratesReady}
+            retirementIconUrl={retirementIconUrl}
           />
         </motion.div>
 

@@ -13,6 +13,7 @@ import { HOME_SECTION_TITLE_CLASS } from './sectionTitle.js'
  *   retirementAud: number,
  *   rates: { JPY: number, USD: number },
  *   ratesReady: boolean,
+ *   retirementIconUrl?: string | null,
  * }} props
  */
 export function GeographySection({
@@ -20,6 +21,7 @@ export function GeographySection({
   retirementAud,
   rates,
   ratesReady,
+  retirementIconUrl,
 }) {
   const {
     goToAccountsByCountry,
@@ -61,7 +63,7 @@ export function GeographySection({
           onNavigate={() => goToAccountsByCountry('EC')}
         />
         <GeographyTile
-          flag={GEO_FLAGS.retirement}
+          flag={retirementIconUrl ?? GEO_FLAGS.retirement}
           title="Retirement"
           subtitle="Superannuation"
           regionNative="AUD"

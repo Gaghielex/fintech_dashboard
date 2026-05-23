@@ -4,6 +4,7 @@ import {
   SCHEDULE_STATUS_LABEL,
 } from '../../utils/goalProgress.js'
 import { GoalCompletionDonut } from './GoalCompletionDonut.jsx'
+import { InstitutionLogo } from '../InstitutionLogo.jsx'
 
 function GoalIcon({ accent }) {
   const isGold = accent === 'gold'
@@ -56,9 +57,10 @@ function StatusBadge({ status }) {
  *   goal: import('../../types/sheetTypes.js').GoalRow,
  *   allocatedAud: number,
  *   ratesReady: boolean,
+ *   dragHandle?: React.ReactNode,
  * }} props
  */
-export function GoalCard({ goal, allocatedAud, ratesReady }) {
+export function GoalCard({ goal, allocatedAud, ratesReady, dragHandle }) {
   const now = new Date()
   const m = computeGoalMetrics(goal, allocatedAud, now)
   const accent = String(goal.accent || 'teal').toLowerCase()
@@ -98,11 +100,16 @@ export function GoalCard({ goal, allocatedAud, ratesReady }) {
   })()
   return (
     <article
-      className="rounded-xl border border-border bg-surface px-3.5 py-3"
+      className={`relative rounded-xl border border-border bg-surface px-3.5 pb-3 ${dragHandle ? 'pt-7' : 'pt-3'}`}
     >
+      {dragHandle}
       <header className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-1 items-start gap-2">
-          <GoalIcon accent={accent} />
+          {goal.icon_url ? (
+            <InstitutionLogo name={goal.goal_name} iconUrl={goal.icon_url} size={32} />
+          ) : (
+            <GoalIcon accent={accent} />
+          )}
           <div className="min-w-0 flex-1">
             <h2 className="font-syne truncate text-base font-extrabold leading-snug text-ink">
               {goal.goal_name || 'Untitled goal'}

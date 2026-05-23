@@ -33,6 +33,7 @@
  * @property {string | null} maturity_date
  * @property {string | null} last_updated
  * @property {string | null} notes
+ * @property {string | null} icon_url
  */
 
 /**
@@ -49,6 +50,7 @@
  * @property {string | null} start_date
  * @property {GoalAccent | string} accent
  * @property {string | null} notes
+ * @property {string | null} icon_url
  */
 
 /**

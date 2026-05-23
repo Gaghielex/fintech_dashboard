@@ -51,6 +51,7 @@ function coerceAccount(raw) {
     maturity_date: parseDateCell(raw.maturity_date),
     last_updated: parseDateCell(raw.last_updated),
     notes: parseStringCell(raw.notes),
+    icon_url: parseStringCell(raw.icon_url) ?? null,
   }
 }
 
@@ -67,6 +68,7 @@ function coerceGoal(raw) {
     start_date: parseDateCell(raw.start_date),
     accent: parseStringCell(raw.accent) ?? '',
     notes: parseStringCell(raw.notes),
+    icon_url: parseStringCell(raw.icon_url) ?? null,
   }
 }
 

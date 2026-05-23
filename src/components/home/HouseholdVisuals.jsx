@@ -1,16 +1,32 @@
 /** @typedef {'gabriel' | 'ana' | 'joint'} OwnerKey */
 
 /**
+ * Renders a circular flag. When `flag` is a 2-char lowercase ISO country code
+ * (e.g. "au", "jp") it loads a crisp image from flagcdn.com that fills the
+ * circle. Any other string (emoji, symbol) falls back to centred text.
+ *
  * @param {{ flag: string, label?: string }} props
  */
 export function FlagBadge({ flag, label }) {
+  const imgSrc =
+    flag == null ? null
+    : /^[a-z]{2}$/.test(flag) ? `https://flagcdn.com/w40/${flag}.png`
+    : flag.startsWith('http') || flag.startsWith('/') ? flag
+    : null
+
   return (
     <span
-      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border bg-surface-1 text-[0.85rem] leading-none"
+      className="flex h-6 w-6 shrink-0 overflow-hidden rounded-full border border-border bg-surface-1"
       role="img"
       aria-label={label}
     >
-      {flag}
+      {imgSrc ? (
+        <img src={imgSrc} alt="" className="h-full w-full object-cover" />
+      ) : (
+        <span className="flex h-full w-full items-center justify-center text-[0.85rem] leading-none">
+          {flag}
+        </span>
+      )}
     </span>
   )
 }

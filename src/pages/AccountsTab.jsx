@@ -5,14 +5,15 @@ import { useNavigation } from '../context/useNavigation.js'
 import { convertToAud } from '../utils/currencyConvert.js'
 import { formatMoney } from '../utils/formatCurrency.js'
 import { getAccountsSheetEditUrl } from '../utils/goalsSheetUrl.js'
+import { InstitutionLogo } from '../components/InstitutionLogo.jsx'
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
 const COUNTRY_ORDER = ['AU', 'JP', 'EC']
 const COUNTRY_META = {
-  AU: { label: 'Australia', flag: '🇦🇺', native: 'AUD' },
-  JP: { label: 'Japan', flag: '🇯🇵', native: 'JPY' },
-  EC: { label: 'Ecuador', flag: '🇪🇨', native: 'USD' },
+  AU: { label: 'Australia', flagCode: 'au', native: 'AUD' },
+  JP: { label: 'Japan', flagCode: 'jp', native: 'JPY' },
+  EC: { label: 'Ecuador', flagCode: 'ec', native: 'USD' },
 }
 
 const TYPE_ORDER = ['cash', 'transaction', 'savings', 'term_deposit', 'super', 'other']
@@ -91,11 +92,13 @@ function fmtDate(iso) {
 
 function TypeBadge({ type }) {
   const cls =
-    type === 'savings'
-      ? 'bg-primary/10 text-primary'
-      : type === 'term_deposit' || type === 'super'
-        ? 'bg-accent-gold/10 text-accent-gold'
-        : 'bg-surface-1 text-ink-muted'
+    type === 'cash'
+      ? 'bg-ink/10 text-ink'
+      : type === 'savings'
+        ? 'bg-primary/10 text-primary'
+        : type === 'term_deposit' || type === 'super'
+          ? 'bg-accent-gold/10 text-accent-gold'
+          : 'bg-surface-1 text-ink-muted'
   return (
     <span
       className={`font-dm-sans inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${cls}`}
@@ -167,6 +170,11 @@ function AccountRow({ account, rates, staleThresholdDays }) {
         className="flex min-h-[44px] w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-1/50"
         aria-expanded={open}
       >
+        <InstitutionLogo
+          name={account.bank}
+          iconUrl={account.icon_url}
+          size={32}
+        />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
             <span className="font-dm-sans text-sm font-medium text-ink">
@@ -271,6 +279,7 @@ function AccountSection({
   sectionKey,
   title,
   subtitle,
+  flagUrl,
   totalAud,
   nativeTotal,
   nativeCcy,
@@ -296,11 +305,22 @@ function AccountSection({
         className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-1/30"
         aria-expanded={!collapsed}
       >
-        <div className="min-w-0">
-          <p className="font-syne text-sm font-bold text-ink">{title}</p>
-          {subtitle && (
-            <p className="font-dm-sans text-xs text-ink-muted">{subtitle}</p>
+        <div className="flex min-w-0 items-center gap-2">
+          {flagUrl && (
+            <div className="h-5 w-5 shrink-0 overflow-hidden rounded-full">
+              <img
+                src={flagUrl}
+                alt=""
+                className="h-full w-full object-cover"
+              />
+            </div>
           )}
+          <div className="min-w-0">
+            <p className="font-syne text-sm font-bold text-ink">{title}</p>
+            {subtitle && (
+              <p className="font-dm-sans text-xs text-ink-muted">{subtitle}</p>
+            )}
+          </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-3">
@@ -389,9 +409,11 @@ export function AccountsTab({
   const [activeFilter, setActiveFilter] = useState('all')
   const [groupMode, setGroupMode] = useState('country')
   const [collapsedSections, setCollapsedSections] = useState(() => new Set())
+  const [searchQuery, setSearchQuery] = useState('')
 
   /* eslint-disable react-hooks/set-state-in-effect -- reset filters when Home drill-down context changes */
   useEffect(() => {
+    setSearchQuery('')
     setGroupMode('country')
     if (accountsEntry.owner) {
       setActiveFilter(accountsEntry.owner)
@@ -448,9 +470,21 @@ export function AccountsTab({
     return result
   }, [accounts, activeFilter, accountsEntry.retirementOnly])
 
+  // Search filter applied on top of owner filter
+  const searchedAccounts = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase()
+    if (!q) return filteredAccounts
+    return filteredAccounts.filter(
+      (a) =>
+        norm(a.account_name).includes(q) ||
+        norm(a.bank).includes(q) ||
+        norm(a.owner).includes(q),
+    )
+  }, [filteredAccounts, searchQuery])
+
   const totalVisibleAud = useMemo(
-    () => sumToAud(filteredAccounts, rates),
-    [filteredAccounts, rates],
+    () => sumToAud(searchedAccounts, rates),
+    [searchedAccounts, rates],
   )
 
   const sections = useMemo(() => {
@@ -458,7 +492,7 @@ export function AccountsTab({
       const result = []
       for (const cc of COUNTRY_ORDER) {
         const meta = COUNTRY_META[cc]
-        const accs = filteredAccounts.filter(
+        const accs = searchedAccounts.filter(
           (a) => norm(a.country) === cc.toLowerCase() && norm(a.type) !== 'super',
         )
         if (!accs.length) continue
@@ -467,7 +501,8 @@ export function AccountsTab({
         )
         result.push({
           key: cc,
-          title: `${meta.flag} ${meta.label}`,
+          title: meta.label,
+          flagUrl: `https://flagcdn.com/w40/${meta.flagCode}.png`,
           totalAud: sumToAud(accs, rates),
           nativeTotal: allSameCcy
             ? accs.reduce((s, a) => s + (Number(a.balance) || 0), 0)
@@ -478,12 +513,13 @@ export function AccountsTab({
           variant: 'default',
         })
       }
-      const superAccs = filteredAccounts.filter((a) => norm(a.type) === 'super')
+      const superAccs = searchedAccounts.filter((a) => norm(a.type) === 'super')
       if (superAccs.length) {
         result.push({
           key: 'retirement',
           title: 'Retirement',
           subtitle: 'Superannuation',
+          flagUrl: superAccs.find((a) => a.icon_url)?.icon_url ?? null,
           totalAud: sumToAud(superAccs, rates),
           nativeTotal: null,
           nativeCcy: 'AUD',
@@ -497,7 +533,7 @@ export function AccountsTab({
 
     if (groupMode === 'type') {
       return TYPE_ORDER.flatMap((type) => {
-        const accs = filteredAccounts.filter((a) => norm(a.type) === type)
+        const accs = searchedAccounts.filter((a) => norm(a.type) === type)
         if (!accs.length) return []
         return [
           {
@@ -516,7 +552,7 @@ export function AccountsTab({
 
     if (groupMode === 'person') {
       return OWNER_ORDER.flatMap((owner) => {
-        const accs = filteredAccounts.filter((a) => norm(a.owner) === owner)
+        const accs = searchedAccounts.filter((a) => norm(a.owner) === owner)
         if (!accs.length) return []
         return [
           {
@@ -534,7 +570,7 @@ export function AccountsTab({
     }
 
     return []
-  }, [filteredAccounts, groupMode, rates])
+  }, [searchedAccounts, groupMode, rates])
 
   const isEmptyAccountSheet = !loading && !error && accounts.length === 0
 
@@ -583,8 +619,8 @@ export function AccountsTab({
                 {formatMoney(totalVisibleAud, 'AUD', { maxFractionDigits: 0 })}
               </span>
               <span className="font-dm-sans text-xs text-ink-muted">
-                · {filteredAccounts.length} account
-                {filteredAccounts.length === 1 ? '' : 's'}
+                · {searchedAccounts.length} account
+                {searchedAccounts.length === 1 ? '' : 's'}
               </span>
             </>
           )}
@@ -625,6 +661,45 @@ export function AccountsTab({
         </div>
       )}
 
+      {/* Search input */}
+      <div className="relative">
+        <svg
+          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search accounts…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className="font-dm-sans w-full rounded-xl border border-border bg-surface py-2.5 pl-9 pr-9 text-sm text-ink placeholder:text-ink-faint focus:border-primary focus:outline-none"
+        />
+        {searchQuery ? (
+          <button
+            type="button"
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint transition hover:text-ink"
+            aria-label="Clear search"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="h-4 w-4">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        ) : null}
+      </div>
+
       <div className="flex gap-1 rounded-lg border border-border bg-surface p-1">
         {GROUP_OPTIONS.map((opt) => (
           <button
@@ -644,7 +719,9 @@ export function AccountsTab({
 
       {!loading && sections.length === 0 ? (
         <p className="font-dm-sans py-10 text-center text-sm text-ink-muted">
-          No accounts match this filter.
+          {searchQuery.trim()
+            ? 'No accounts match your search.'
+            : 'No accounts match this filter.'}
         </p>
       ) : (
         <div className="space-y-3">
@@ -654,6 +731,7 @@ export function AccountsTab({
               sectionKey={s.key}
               title={s.title}
               subtitle={s.subtitle}
+              flagUrl={s.flagUrl}
               totalAud={s.totalAud}
               nativeTotal={s.nativeTotal}
               nativeCcy={s.nativeCcy}
