@@ -69,7 +69,7 @@ export function BottomNav() {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 flex justify-center lg:hidden"
-      style={{ paddingBottom: 'max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))' }}
+      style={{ paddingBottom: 'max(0.55rem, calc(env(safe-area-inset-bottom) + 0.2rem))' }}
       aria-label="Main"
     >
       <div
@@ -104,6 +104,7 @@ export function BottomNav() {
                   style={{
                     background: 'rgba(0, 200, 150, 0.12)',
                     border: '1px solid rgba(0, 200, 150, 0.22)',
+                    boxShadow: '0 0 18px rgba(0, 200, 150, 0.22), 0 0 36px rgba(0, 200, 150, 0.12)',
                   }}
                   transition={{ type: 'spring', stiffness: 420, damping: 46, mass: 0.8 }}
                 />
