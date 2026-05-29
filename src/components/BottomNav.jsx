@@ -73,7 +73,7 @@ export function BottomNav() {
       aria-label="Main"
     >
       <div
-        className="flex items-center gap-1 rounded-full px-[0.7rem] py-[0.6rem]"
+        className="flex w-[calc(100vw-1rem)] max-w-[377px] items-center justify-between gap-1 rounded-full px-[0.7rem] py-[0.6rem]"
         style={{
           background: 'rgba(42, 52, 70, 0.42)',
           backdropFilter: 'blur(28px) saturate(1.6)',
@@ -95,7 +95,7 @@ export function BottomNav() {
               type="button"
               onClick={onActivate}
               aria-current={active ? 'page' : undefined}
-              className="relative flex items-center gap-[0.475rem] rounded-full px-[1.07rem] py-[0.6rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="relative flex items-center gap-[0.475rem] rounded-full px-4 py-[0.6rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             >
               {active && (
                 <motion.div
