@@ -1,5 +1,8 @@
 /** @typedef {'gabriel' | 'ana' | 'joint'} OwnerKey */
 
+const AVATAR_G_URL = `${import.meta.env.BASE_URL}Avatar-G.png`
+const AVATAR_A_URL = `${import.meta.env.BASE_URL}Avatar-A.png`
+
 /**
  * Renders a circular flag. When `flag` is a 2-char lowercase ISO country code
  * (e.g. "au", "jp") it loads a crisp image from flagcdn.com that fills the
@@ -46,7 +49,7 @@ export function OwnerAvatar({ owner, size = '24' }) {
 
   const isGabriel = owner === 'gabriel'
   const dim = SINGLE_AVATAR_SIZES[size] ?? SINGLE_AVATAR_SIZES[24]
-  const src = isGabriel ? '/Avatar-G.png' : '/Avatar-A.png'
+  const src = isGabriel ? AVATAR_G_URL : AVATAR_A_URL
   const name = isGabriel ? 'Gabriel' : 'Ana'
   return (
     <span className={`flex shrink-0 overflow-hidden rounded-full border border-border ${dim}`} aria-label={name}>
@@ -85,10 +88,10 @@ export function JointAvatars({ size = '24' }) {
   return (
     <div className={`relative shrink-0 ${s.container}`} aria-hidden>
       <span className={`${inner} left-0 overflow-hidden ${s.inner}`}>
-        <img src="/Avatar-G.png" alt="Gabriel" className="h-full w-full object-cover" />
+        <img src={AVATAR_G_URL} alt="Gabriel" className="h-full w-full object-cover" />
       </span>
       <span className={`${inner} right-0 overflow-hidden ${s.inner}`}>
-        <img src="/Avatar-A.png" alt="Ana" className="h-full w-full object-cover" />
+        <img src={AVATAR_A_URL} alt="Ana" className="h-full w-full object-cover" />
       </span>
     </div>
   )

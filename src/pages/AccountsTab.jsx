@@ -29,6 +29,8 @@ const TYPE_LABEL = {
 const OWNER_ORDER = ['gabriel', 'ana', 'joint']
 const OWNER_LABEL = { gabriel: 'Gabriel', ana: 'Ana', joint: 'Joint' }
 const OWNER_INITIAL = { gabriel: 'G', ana: 'A', joint: 'J' }
+const AVATAR_G_URL = `${import.meta.env.BASE_URL}Avatar-G.png`
+const AVATAR_A_URL = `${import.meta.env.BASE_URL}Avatar-A.png`
 
 const FILTER_OPTIONS = [
   { id: 'all', label: 'All' },
@@ -649,7 +651,7 @@ export function AccountsTab({
             const isActive = activeFilter === opt.id
             const hasSingleAvatar = isActive && (opt.id === 'gabriel' || opt.id === 'ana')
             const hasJointAvatar = isActive && opt.id === 'joint'
-            const avatarSrc = opt.id === 'gabriel' ? '/Avatar-G.png' : opt.id === 'ana' ? '/Avatar-A.png' : null
+            const avatarSrc = opt.id === 'gabriel' ? AVATAR_G_URL : opt.id === 'ana' ? AVATAR_A_URL : null
             return (
               <button
                 key={opt.id}
@@ -670,8 +672,8 @@ export function AccountsTab({
                 )}
                 {hasJointAvatar && (
                   <div className="relative h-6 w-8 shrink-0">
-                    <img src="/Avatar-G.png" alt="" className="absolute left-0 h-6 w-6 rounded-full object-cover border border-white/20" />
-                    <img src="/Avatar-A.png" alt="" className="absolute right-0 h-6 w-6 rounded-full object-cover border border-white/20" />
+                    <img src={AVATAR_G_URL} alt="" className="absolute left-0 h-6 w-6 rounded-full object-cover border border-white/20" />
+                    <img src={AVATAR_A_URL} alt="" className="absolute right-0 h-6 w-6 rounded-full object-cover border border-white/20" />
                   </div>
                 )}
                 {opt.label}
