@@ -100,7 +100,11 @@ export function GoalCard({ goal, allocatedAud, ratesReady, dragHandle }) {
   })()
   return (
     <article
-      className={`relative rounded-xl border glass-card px-3.5 pb-3 ${dragHandle ? 'pt-7' : 'pt-3'}`}
+      className={`relative select-none rounded-xl border glass-card px-3.5 pb-3 ${dragHandle ? 'pt-7' : 'pt-3'}`}
+      style={{
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+      }}
     >
       {dragHandle}
       {dragHandle && <div className="mb-3 -mx-3.5 border-t border-border/50" />}

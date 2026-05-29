@@ -80,6 +80,9 @@ function DraggableGoalCard({ goal, allocatedAud, ratesReady, onReorderStart, onR
       style={{
         opacity: isDragging ? 0.55 : 1,
         transition: 'opacity 0.2s ease',
+        WebkitTouchCallout: 'none',
+        WebkitUserSelect: 'none',
+        userSelect: 'none',
       }}
     >
       <GoalCard
@@ -94,7 +97,9 @@ function DraggableGoalCard({ goal, allocatedAud, ratesReady, onReorderStart, onR
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
+            onContextMenu={(e) => e.preventDefault()}
             className="absolute inset-x-0 top-0 flex h-7 items-center justify-center touch-none cursor-grab active:cursor-grabbing"
+            style={{ WebkitTouchCallout: 'none' }}
           >
             <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden className="text-ink-faint/40" fill="currentColor">
               <circle cx="2.5" cy="2" r="1.5" />
