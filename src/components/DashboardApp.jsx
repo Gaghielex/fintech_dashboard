@@ -138,9 +138,8 @@ export default function DashboardApp() {
   const refreshing = sheet.loading || fx.loading
 
   const onRefresh = useCallback(() => {
-    sheet.refetch()
-    fx.refetch()
-  }, [sheet.refetch, fx.refetch])
+    window.location.reload()
+  }, [])
 
   const ptr = usePullToRefresh({ onRefresh, disabled: refreshing })
 
