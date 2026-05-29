@@ -31,8 +31,9 @@ export function isInNetWorth(a) {
   return Boolean(norm(a.type))
 }
 
-/** Sheet account id for Up Bank savers (Goals “Up savers only” toggle). */
+/** Sheet account ids for Up Bank savers sub-toggles. */
 export const UP_SAVERS_ACCOUNT_ID = 'au-up-02'
+export const UP_SAVERS_GABS_ID    = 'au-up-03'
 
 /**
  * @param {import('../types/sheetTypes.js').AccountRow} a
@@ -82,17 +83,21 @@ function sumAud(accounts, rates, predicate) {
 }
 
 /**
- * Liquid AUD for Goals tab: all liquid accounts or a single Up savers row.
+ * Liquid AUD for Goals tab: all liquid accounts or a filtered set of Up saver accounts.
  * @param {import('../types/sheetTypes.js').AccountRow[]} accounts
  * @param {{ JPY: number, USD: number } | null} rates
- * @param {{ upSaversOnly?: boolean }} [opts]
+ * @param {{ upSaversOnly?: boolean, upSaverIds?: string[] }} [opts]
  */
 export function computeGoalsLiquidAud(accounts, rates, opts = {}) {
   const r = rates ?? { JPY: 0, USD: 0 }
   if (opts.upSaversOnly) {
-    const acc = accounts.find((a) => norm(a.id) === UP_SAVERS_ACCOUNT_ID)
-    if (!acc) return 0
-    return convertToAud(Number(acc.balance) || 0, String(acc.currency), r)
+    const ids = opts.upSaverIds ?? [UP_SAVERS_ACCOUNT_ID]
+    if (ids.length === 0) return 0
+    return ids.reduce((sum, id) => {
+      const acc = accounts.find((a) => norm(a.id) === id)
+      if (!acc) return sum
+      return sum + convertToAud(Number(acc.balance) || 0, String(acc.currency), r)
+    }, 0)
   }
   return sumAud(accounts, r, isInLiquid)
 }

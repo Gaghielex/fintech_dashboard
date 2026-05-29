@@ -86,6 +86,18 @@ function coerceFxSnapshot(raw) {
 /**
  * @param {Record<string, unknown>} raw
  */
+function coerceNetWorthSnapshot(raw) {
+  return {
+    date: parseDateCell(raw.date),
+    total_aud: parseNumberCell(raw.total_aud),
+    liquid_aud: parseNumberCell(raw.liquid_aud),
+    deposits_aud: parseNumberCell(raw.deposits_aud),
+  }
+}
+
+/**
+ * @param {Record<string, unknown>} raw
+ */
 function coerceSettings(raw) {
   return {
     base_currency: parseStringCell(raw.base_currency),
@@ -107,6 +119,9 @@ export function parseTabByTitle(tabTitle, rows) {
   }
   if (key === 'goals') {
     return { kind: 'goals', data: records.map(coerceGoal) }
+  }
+  if (key === 'snapshots') {
+    return { kind: 'net_worth_snapshots', data: records.map(coerceNetWorthSnapshot) }
   }
   if (key === 'fx snapshots' || key === 'fx_snapshots') {
     return { kind: 'fx_snapshots', data: records.map(coerceFxSnapshot) }
@@ -148,6 +163,8 @@ export function buildParsedBundle(tabOrder, titleToRows, sheetGids = {}) {
   const goals = []
   /** @type {import('../types/sheetTypes.js').FxSnapshotRow[]} */
   const fxSnapshots = []
+  /** @type {import('../types/sheetTypes.js').NetWorthSnapshotRow[]} */
+  const netWorthSnapshots = []
   /** @type {import('../types/sheetTypes.js').SettingsRow | null} */
   let settings = null
   /** @type {Record<string, string[][]>} */
@@ -162,6 +179,8 @@ export function buildParsedBundle(tabOrder, titleToRows, sheetGids = {}) {
       goals.push(...parsed.data)
     } else if (parsed.kind === 'fx_snapshots') {
       fxSnapshots.push(...parsed.data)
+    } else if (parsed.kind === 'net_worth_snapshots') {
+      netWorthSnapshots.push(...parsed.data)
     } else if (parsed.kind === 'settings') {
       settings = parsed.data
     } else {
@@ -173,6 +192,7 @@ export function buildParsedBundle(tabOrder, titleToRows, sheetGids = {}) {
     accounts,
     goals,
     fxSnapshots,
+    netWorthSnapshots,
     settings,
     rawTabs,
     tabOrder: [...tabOrder],

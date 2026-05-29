@@ -200,6 +200,8 @@ Rules:
 
 #### ME-01 — Bottom nav redesign (glass pill)
 
+**Status:** ✅ Implemented
+
 **What:** Redesign the bottom navigation bar with a floating glass pill aesthetic and a smooth active-state animation.
 
 **Visual spec:**
@@ -279,6 +281,8 @@ See HE-05 for full spec. This view slot is active in V2, not a placeholder.
 
 #### ME-04 — Net worth delta chip
 
+**Status:** ✅ Implemented
+
 **What:** Surface a net worth delta on the home screen hero section, derived from the Snapshots sheet tab.
 
 **Display:** Below or adjacent to the hero net worth number:
@@ -293,6 +297,8 @@ See HE-05 for full spec. This view slot is active in V2, not a placeholder.
 ---
 
 #### ME-05 — Net worth trend chart
+
+**Status:** ✅ Implemented
 
 **What:** A line chart showing total net worth over time, built from the Snapshots tab.
 
@@ -314,6 +320,8 @@ See HE-05 for full spec. This view slot is active in V2, not a placeholder.
 ---
 
 #### ME-06 — Avatars redesign (G and A)
+
+**Status:** ✅ Implemented
 
 **What:** Redesign the overlapping avatar initials in the top right of the home screen.
 
@@ -385,6 +393,8 @@ See HE-05 for full spec. This view slot is active in V2, not a placeholder.
 ---
 
 #### HE-04 — Glass card treatment (app-wide)
+
+**Status:** ✅ Implemented
 
 **What:** Apply glass morphism consistently across card surfaces throughout the app.
 
@@ -458,16 +468,16 @@ box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset; /* rim light */
 | QW-07 | Search on Accounts tab | Quick win | -- | ✅ Done |
 | QW-08 | Number masking | Quick win | -- | ✅ Done |
 | QW-09 | Country flag icons | Quick win | -- | ✅ Done |
-| ME-01 | Bottom nav glass pill + animation | Medium | Design spec | |
+| ME-01 | Bottom nav glass pill + animation | Medium | Design spec | ✅ Done |
 | ME-02 | Converter swipeable rate cards | Medium | Frankfurter historical API, shares fetch with HE-01 | |
 | ME-03 | Three-view geography section | Medium | Recharts (donut), HE-05 (map) | |
-| ME-04 | Net worth delta chip | Medium | Snapshots tab | |
-| ME-05 | Net worth trend chart | Medium | Snapshots tab, ME-04 | |
-| ME-06 | Avatars redesign (G and A) | Medium | Design asset | |
+| ME-04 | Net worth delta chip | Medium | Snapshots tab | ✅ Done |
+| ME-05 | Net worth trend chart | Medium | Snapshots tab, ME-04 | ✅ Done |
+| ME-06 | Avatars redesign (G and A) | Medium | Design asset | ✅ Done |
 | HE-01 | Historical FX chart | Higher effort | Frankfurter historical API, shares fetch with ME-02 | |
 | HE-02 | In-app rate threshold alert | Higher effort | -- | |
 | HE-03 | Nav icons revamp | Higher effort | -- | ✅ Done |
-| HE-04 | Glass card treatment (app-wide) | Higher effort | ME-01 | |
+| HE-04 | Glass card treatment (app-wide) | Higher effort | ME-01 | ✅ Done |
 | HE-05 | Interactive map view | Higher effort | ME-03, Mapbox GL JS | |
 
 ---

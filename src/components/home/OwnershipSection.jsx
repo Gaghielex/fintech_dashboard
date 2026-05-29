@@ -87,9 +87,11 @@ function OwnerTile({ owner, label, amountAud, ready, onOpen }) {
       onClick={onOpen}
       whileTap={{ opacity: 0.72, scale: 0.98 }}
       transition={{ duration: 0.1 }}
-      className="flex min-w-0 flex-col items-center gap-2 rounded-xl border border-border bg-surface px-2 py-4 text-center outline-none transition-colors hover:bg-surface-1/80 focus-visible:ring-2 focus-visible:ring-primary/40"
+      className="flex min-w-0 flex-col items-center gap-2 rounded-xl border glass-card px-2 py-4 text-center outline-none transition-colors hover:brightness-110 focus-visible:ring-2 focus-visible:ring-primary/40"
     >
-      <OwnerAvatar owner={owner} size="40" />
+      <div className="flex h-12 items-center justify-center">
+        <OwnerAvatar owner={owner} size="40" />
+      </div>
       <p className="font-dm-mono text-lg font-bold leading-tight tabular-nums text-ink">
         {ready ? formatCompactAud(amountAud) : '—'}
       </p>

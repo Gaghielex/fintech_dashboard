@@ -107,12 +107,8 @@ export function SideNav() {
 
       {/* Household avatars */}
       <div className="flex items-center gap-2 px-5 py-4 border-t border-border">
-        <span className="font-syne flex h-8 w-8 items-center justify-center rounded-full border-2 border-canvas bg-surface-1 text-xs font-bold text-primary">
-          G
-        </span>
-        <span className="font-syne -ml-2 flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-surface text-xs font-bold text-accent-pink">
-          A
-        </span>
+        <img src="/Avatar-G.png" alt="Gabriel" className="h-8 w-8 rounded-full border-2 border-canvas object-cover" />
+        <img src="/Avatar-A.png" alt="Ana" className="-ml-2 h-8 w-8 rounded-full border-2 border-surface object-cover" />
         <span className="font-dm-sans ml-1 text-xs text-ink-muted">Household</span>
       </div>
     </aside>

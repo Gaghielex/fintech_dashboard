@@ -9,4 +9,7 @@ const GITHUB_PAGES_BASE = '/fintech_dashboard/'
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? GITHUB_PAGES_BASE : '/',
   plugins: [react(), tailwindcss()],
+  optimizeDeps: {
+    include: ['recharts'],
+  },
 }))

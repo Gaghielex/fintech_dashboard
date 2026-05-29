@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useRef } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
-import { computeGoalsLiquidAud } from '../utils/financeAggregate.js'
+import { computeGoalsLiquidAud, UP_SAVERS_ACCOUNT_ID, UP_SAVERS_GABS_ID } from '../utils/financeAggregate.js'
 import { computeGoalsLiquidAllocation } from '../utils/goalProgress.js'
 import { getGoalsSheetEditUrl } from '../utils/goalsSheetUrl.js'
 import { GoalsLiquidStrip } from '../components/goals/GoalsLiquidStrip.jsx'
@@ -49,10 +49,11 @@ function DraggableGoalCard({ goal, allocatedAud, ratesReady, onReorderStart, onR
   const handlePointerDown = (e) => {
     savedEvent.current = e
     startPos.current = { x: e.clientX, y: e.clientY }
+    const delay = e.pointerType === 'mouse' ? 0 : 300
     timerRef.current = setTimeout(() => {
       timerRef.current = null
       activate()
-    }, 2000)
+    }, delay)
   }
 
   const handlePointerMove = (e) => {
@@ -93,9 +94,16 @@ function DraggableGoalCard({ goal, allocatedAud, ratesReady, onReorderStart, onR
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onPointerCancel={handlePointerUp}
-            className="absolute inset-x-0 top-0 flex cursor-grab justify-center pt-2.5 touch-none active:cursor-grabbing"
+            className="absolute inset-x-0 top-0 flex h-7 items-center justify-center touch-none cursor-grab active:cursor-grabbing"
           >
-            <div className="h-[3px] w-10 rounded-full bg-ink-faint/50" />
+            <svg width="20" height="8" viewBox="0 0 20 8" aria-hidden className="text-ink-faint/40" fill="currentColor">
+              <circle cx="2.5" cy="2" r="1.5" />
+              <circle cx="10"  cy="2" r="1.5" />
+              <circle cx="17.5" cy="2" r="1.5" />
+              <circle cx="2.5" cy="6" r="1.5" />
+              <circle cx="10"  cy="6" r="1.5" />
+              <circle cx="17.5" cy="6" r="1.5" />
+            </svg>
           </button>
         }
       />
@@ -122,10 +130,19 @@ export function GoalsTab({
   sheetGids,
 }) {
   const [upSaversOnly, setUpSaversOnly] = useState(true)
+  const [upSaverSelection, setUpSaverSelection] = useState({ rmit: true, gabs: false })
+
+  const upSaverIds = useMemo(() => {
+    if (!upSaversOnly) return undefined
+    const ids = []
+    if (upSaverSelection.rmit) ids.push(UP_SAVERS_ACCOUNT_ID)
+    if (upSaverSelection.gabs) ids.push(UP_SAVERS_GABS_ID)
+    return ids
+  }, [upSaversOnly, upSaverSelection])
 
   const liquidAud = useMemo(
-    () => computeGoalsLiquidAud(accounts, latestRates, { upSaversOnly }),
-    [accounts, latestRates, upSaversOnly],
+    () => computeGoalsLiquidAud(accounts, latestRates, { upSaversOnly, upSaverIds }),
+    [accounts, latestRates, upSaversOnly, upSaverIds],
   )
 
   const ratesReady = Boolean(
@@ -181,6 +198,10 @@ export function GoalsTab({
         goals={goals}
         upSaversOnly={upSaversOnly}
         onUpSaversOnlyChange={setUpSaversOnly}
+        upSaverSelection={upSaverSelection}
+        onUpSaverSelectionChange={(key, value) =>
+          setUpSaverSelection((prev) => ({ ...prev, [key]: value }))
+        }
       />
 
       <section>

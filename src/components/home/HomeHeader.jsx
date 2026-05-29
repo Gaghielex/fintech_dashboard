@@ -15,7 +15,7 @@ export function HomeHeader() {
         </h1>
       </div>
       <div className="flex shrink-0 items-center" aria-label="Household">
-        <JointAvatars size="40" />
+        <JointAvatars size="56" />
       </div>
     </header>
   )

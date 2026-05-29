@@ -74,11 +74,12 @@ export function GeographyTile({
     <motion.div
       whileTap={{ opacity: 0.72 }}
       transition={{ duration: 0.1 }}
-      className={`cursor-pointer rounded-xl border p-4 text-left outline-none transition-colors hover:bg-surface-1/80 focus-visible:ring-2 focus-visible:ring-primary/40 ${
+      className={`cursor-pointer rounded-xl border p-4 text-left outline-none backdrop-blur-xl transition-colors focus-visible:ring-2 focus-visible:ring-primary/40 ${
         isRetirement
-          ? 'border-accent-gold/50 bg-surface/80'
-          : 'border-border bg-surface'
+          ? 'border-accent-gold/50'
+          : 'border-white/[0.06]'
       }`}
+      style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.012) 45%, transparent 75%), rgba(22,27,34,0.6)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.13), inset 1px 0 0 rgba(255,255,255,0.05), inset -1px 0 0 rgba(255,255,255,0.05)' }}
       onClick={onNavigate}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {

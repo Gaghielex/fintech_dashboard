@@ -32,8 +32,8 @@ export function FlagBadge({ flag, label }) {
 }
 
 const SINGLE_AVATAR_SIZES = {
-  24: 'h-6 w-6 text-[0.65rem]',
-  40: 'h-10 w-10 text-[0.8rem]',
+  24: 'h-6 w-6',
+  40: 'h-10 w-10',
 }
 
 /**
@@ -46,16 +46,11 @@ export function OwnerAvatar({ owner, size = '24' }) {
 
   const isGabriel = owner === 'gabriel'
   const dim = SINGLE_AVATAR_SIZES[size] ?? SINGLE_AVATAR_SIZES[24]
+  const src = isGabriel ? '/Avatar-G.png' : '/Avatar-A.png'
+  const name = isGabriel ? 'Gabriel' : 'Ana'
   return (
-    <span
-      className={`font-syne flex shrink-0 items-center justify-center rounded-full border border-border font-bold ${dim} ${
-        isGabriel
-          ? 'bg-primary/15 text-primary'
-          : 'bg-accent-pink/15 text-accent-pink'
-      }`}
-      aria-hidden
-    >
-      {isGabriel ? 'G' : 'A'}
+    <span className={`flex shrink-0 overflow-hidden rounded-full border border-border ${dim}`} aria-label={name}>
+      <img src={src} alt="" className="h-full w-full object-cover" />
     </span>
   )
 }
@@ -70,8 +65,12 @@ const JOINT_AVATAR_SIZES = {
     inner: 'top-[0.3rem] h-[1.15rem] w-[1.15rem] text-[0.65rem]',
   },
   40: {
-    container: 'h-10 w-10',
-    inner: 'top-[0.35rem] h-[1.45rem] w-[1.45rem] text-[0.75rem]',
+    container: 'h-12 w-12',
+    inner: 'top-[0.25rem] h-[1.85rem] w-[1.85rem] text-[0.85rem]',
+  },
+  56: {
+    container: 'h-14 w-14',
+    inner: 'top-[0.3rem] h-[2.2rem] w-[2.2rem] text-[1rem]',
   },
 }
 
@@ -85,11 +84,11 @@ export function JointAvatars({ size = '24' }) {
 
   return (
     <div className={`relative shrink-0 ${s.container}`} aria-hidden>
-      <span className={`${inner} left-0 bg-surface-1 text-primary ${s.inner}`}>
-        G
+      <span className={`${inner} left-0 overflow-hidden ${s.inner}`}>
+        <img src="/Avatar-G.png" alt="Gabriel" className="h-full w-full object-cover" />
       </span>
-      <span className={`${inner} right-0 bg-surface text-accent-pink ${s.inner}`}>
-        A
+      <span className={`${inner} right-0 overflow-hidden ${s.inner}`}>
+        <img src="/Avatar-A.png" alt="Ana" className="h-full w-full object-cover" />
       </span>
     </div>
   )

@@ -295,9 +295,10 @@ function AccountSection({
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border bg-surface ${
-        isRetirement ? 'border-accent-gold/40' : 'border-border'
+      className={`overflow-hidden rounded-xl border backdrop-blur-xl ${
+        isRetirement ? 'border-accent-gold/40' : 'border-white/[0.06]'
       }`}
+      style={{ background: 'rgba(22,27,34,0.6)', boxShadow: '0 1px 0 0 rgba(255,255,255,0.08) inset' }}
     >
       <button
         type="button"
@@ -644,20 +645,39 @@ export function AccountsTab({
 
       {!accountsEntry.retirementOnly && (
         <div className="flex flex-wrap gap-2 pb-0.5">
-          {FILTER_OPTIONS.map((opt) => (
-            <button
-              key={opt.id}
-              type="button"
-              onClick={() => setActiveFilter(opt.id)}
-              className={`font-dm-sans shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                activeFilter === opt.id
-                  ? 'bg-primary text-canvas'
-                  : 'border border-border bg-surface text-ink-muted hover:bg-surface-1'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
+          {FILTER_OPTIONS.map((opt) => {
+            const isActive = activeFilter === opt.id
+            const hasSingleAvatar = isActive && (opt.id === 'gabriel' || opt.id === 'ana')
+            const hasJointAvatar = isActive && opt.id === 'joint'
+            const avatarSrc = opt.id === 'gabriel' ? '/Avatar-G.png' : opt.id === 'ana' ? '/Avatar-A.png' : null
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setActiveFilter(opt.id)}
+                className={`font-dm-sans shrink-0 rounded-full text-sm font-medium transition-colors ${
+                  hasSingleAvatar ? 'flex items-center gap-1.5 py-1 pl-1 pr-3.5'
+                  : hasJointAvatar ? 'flex items-center gap-1.5 py-1 pl-1 pr-3.5'
+                  : 'px-4 py-1.5'
+                } ${
+                  isActive
+                    ? 'bg-primary text-canvas'
+                    : 'border border-border bg-surface text-ink-muted hover:bg-surface-1'
+                }`}
+              >
+                {hasSingleAvatar && (
+                  <img src={avatarSrc} alt="" className="h-6 w-6 rounded-full object-cover border border-white/20" />
+                )}
+                {hasJointAvatar && (
+                  <div className="relative h-6 w-8 shrink-0">
+                    <img src="/Avatar-G.png" alt="" className="absolute left-0 h-6 w-6 rounded-full object-cover border border-white/20" />
+                    <img src="/Avatar-A.png" alt="" className="absolute right-0 h-6 w-6 rounded-full object-cover border border-white/20" />
+                  </div>
+                )}
+                {opt.label}
+              </button>
+            )
+          })}
         </div>
       )}
 

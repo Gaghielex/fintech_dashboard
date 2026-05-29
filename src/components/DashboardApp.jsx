@@ -85,6 +85,7 @@ function DashboardBody({ sheet, fx, numbersVisible, onToggleNumbers }) {
         <HomeTab
           accounts={accounts}
           settings={settings}
+          netWorthSnapshots={sheet.data?.netWorthSnapshots ?? []}
           latestRates={latestRates}
           fxDateLabel={fxDateLabel}
           fxFromCache={fx.fromCache}

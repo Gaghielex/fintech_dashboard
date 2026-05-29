@@ -27,7 +27,10 @@ export function RateContextCard({
   const decimals = quoteKey === 'JPY' ? 2 : 4
 
   return (
-    <section className="rounded-xl border border-border bg-surface p-4">
+    <section
+      className="rounded-xl border border-white/[0.06] p-4 backdrop-blur-xl"
+      style={{ background: 'rgba(22,27,34,0.6)', boxShadow: '0 1px 0 0 rgba(255,255,255,0.08) inset' }}
+    >
       <h3 className="font-syne text-base font-bold text-ink">{title}</h3>
       <p className="font-dm-sans mt-0.5 text-xs text-ink-muted">{subtitle}</p>
 

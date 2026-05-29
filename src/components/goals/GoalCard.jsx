@@ -100,9 +100,10 @@ export function GoalCard({ goal, allocatedAud, ratesReady, dragHandle }) {
   })()
   return (
     <article
-      className={`relative rounded-xl border border-border bg-surface px-3.5 pb-3 ${dragHandle ? 'pt-7' : 'pt-3'}`}
+      className={`relative rounded-xl border glass-card px-3.5 pb-3 ${dragHandle ? 'pt-7' : 'pt-3'}`}
     >
       {dragHandle}
+      {dragHandle && <div className="mb-3 -mx-3.5 border-t border-border/50" />}
       <header className="flex items-start justify-between gap-2">
         <div className="flex min-w-0 flex-1 items-start gap-2">
           {goal.icon_url ? (

@@ -23,6 +23,7 @@ const fadeUp = {
  * @param {{
  *   accounts: import('../types/sheetTypes.js').AccountRow[],
  *   settings: import('../types/sheetTypes.js').SettingsRow | null,
+ *   netWorthSnapshots: import('../types/sheetTypes.js').NetWorthSnapshotRow[],
  *   latestRates: { JPY: number, USD: number } | null,
  *   fxDateLabel: string | null,
  *   fxFromCache: boolean,
@@ -36,6 +37,7 @@ const fadeUp = {
 export function HomeTab({
   accounts,
   settings,
+  netWorthSnapshots,
   latestRates,
   fxDateLabel,
   fxFromCache,
@@ -101,6 +103,7 @@ export function HomeTab({
             ratesReady={ratesReady}
             numbersVisible={numbersVisible}
             onToggleNumbers={onToggleNumbers}
+            netWorthSnapshots={netWorthSnapshots}
           />
         </motion.div>
 

@@ -54,6 +54,14 @@
  */
 
 /**
+ * @typedef {Object} NetWorthSnapshotRow
+ * @property {string | null} date
+ * @property {number | null} total_aud
+ * @property {number | null} liquid_aud
+ * @property {number | null} deposits_aud
+ */
+
+/**
  * @typedef {Object} FxSnapshotRow
  * @property {string | null} date
  * @property {number | null} jpy_aud
@@ -72,6 +80,7 @@
  * @property {AccountRow[]} accounts
  * @property {GoalRow[]} goals
  * @property {FxSnapshotRow[]} fxSnapshots
+ * @property {NetWorthSnapshotRow[]} netWorthSnapshots
  * @property {SettingsRow | null} settings
  * @property {Record<string, string[][]>} rawTabs
  * @property {string[]} tabOrder
