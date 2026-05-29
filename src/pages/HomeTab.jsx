@@ -94,7 +94,7 @@ export function HomeTab({
           </p>
         ) : null}
 
-        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible">
+        <motion.div custom={2} variants={fadeUp} initial="hidden" animate="visible" className="-mx-[2.5%] lg:mx-0">
           <HomeHeroSection
             netWorthAud={metrics.netWorthAud}
             liquidAud={metrics.liquidAud}
@@ -107,7 +107,7 @@ export function HomeTab({
           />
         </motion.div>
 
-        <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible">
+        <motion.div custom={3} variants={fadeUp} initial="hidden" animate="visible" className="-mx-[2.5%] lg:mx-0">
           <GeographySection
             geography={metrics.geography}
             retirementAud={metrics.retirementAud}
@@ -117,7 +117,7 @@ export function HomeTab({
           />
         </motion.div>
 
-        <motion.div custom={4} variants={fadeUp} initial="hidden" animate="visible">
+        <motion.div custom={4} variants={fadeUp} initial="hidden" animate="visible" className="-mx-[2.5%] lg:mx-0">
           <OwnershipSection
             gabrielAud={metrics.ownership.gabrielAud}
             anaAud={metrics.ownership.anaAud}

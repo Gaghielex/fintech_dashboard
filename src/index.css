@@ -68,6 +68,12 @@
     color-scheme: dark;
     background-color: var(--palette-canvas);
     overflow-x: hidden;
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
   }
 
   @media (max-width: 1023px) {
