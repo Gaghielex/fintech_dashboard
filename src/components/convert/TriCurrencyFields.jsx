@@ -24,17 +24,17 @@ function formatForActive(amounts, active) {
 /** @type {Record<'AUD'|'JPY'|'USD', { selected: string, focus: string, hint: string }>} */
 const CURRENCY_ACTIVE_STYLES = {
   AUD: {
-    selected: 'border-primary bg-primary/10 ring-1 ring-primary/30',
+    selected: 'border-primary/80 bg-primary/10 ring-1 ring-primary/35',
     focus: 'focus:border-primary focus-visible:ring-primary/40',
     hint: 'text-primary',
   },
   JPY: {
-    selected: 'border-accent-gold bg-accent-gold/10 ring-1 ring-accent-gold/35',
+    selected: 'border-accent-gold/80 bg-accent-gold/10 ring-1 ring-accent-gold/35',
     focus: 'focus:border-accent-gold focus-visible:ring-accent-gold/40',
     hint: 'text-accent-gold',
   },
   USD: {
-    selected: 'border-accent-pink bg-accent-pink/10 ring-1 ring-accent-pink/35',
+    selected: 'border-accent-pink/80 bg-accent-pink/10 ring-1 ring-accent-pink/35',
     focus: 'focus:border-accent-pink focus-visible:ring-accent-pink/40',
     hint: 'text-accent-pink',
   },
@@ -166,6 +166,20 @@ function CurrencyBlock({
 }) {
   const accent = CURRENCY_ACTIVE_STYLES[/** @type {'AUD'|'JPY'|'USD'} */ (code)]
   const focusRing = selected ? accent.focus : 'focus-visible:ring-primary/40'
+  const selectedStyle = selected
+    ? {
+        background:
+          code === 'JPY'
+            ? 'linear-gradient(135deg, rgba(240,196,25,0.18), rgba(255,255,255,0.045) 44%, rgba(240,196,25,0.06)), rgba(22,27,34,0.70)'
+            : code === 'USD'
+              ? 'linear-gradient(135deg, rgba(247,37,133,0.18), rgba(255,255,255,0.045) 44%, rgba(247,37,133,0.06)), rgba(22,27,34,0.70)'
+              : 'linear-gradient(135deg, rgba(0,200,150,0.18), rgba(255,255,255,0.045) 44%, rgba(0,200,150,0.06)), rgba(22,27,34,0.70)',
+        boxShadow:
+          'inset 0 1.5px 0 rgba(255,255,255,0.22), inset 1px 0 0 rgba(255,255,255,0.08), inset -1px 0 0 rgba(255,255,255,0.05), 0 12px 28px rgba(0,0,0,0.24)',
+        backdropFilter: 'blur(18px) saturate(1.35)',
+        WebkitBackdropFilter: 'blur(18px) saturate(1.35)',
+      }
+    : undefined
 
   return (
     <motion.div
@@ -174,6 +188,7 @@ function CurrencyBlock({
         /** @type {'AUD'|'JPY'|'USD'} */ (code),
         selected,
       )}`}
+      style={selectedStyle}
     >
       <div className="flex items-center justify-between gap-3">
         <button

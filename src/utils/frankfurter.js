@@ -6,7 +6,7 @@ const FRANKFURTER = 'https://api.frankfurter.dev/v1'
 export function getDefaultHistoryRange() {
   const to = new Date()
   const from = new Date(to)
-  from.setDate(from.getDate() - 30)
+  from.setDate(from.getDate() - 365)
   return { from: formatIsoDate(from), to: formatIsoDate(to) }
 }
 

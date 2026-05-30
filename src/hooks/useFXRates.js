@@ -58,7 +58,7 @@ function writeCache(payload) {
 }
 
 /**
- * Frankfurter AUD→JPY, AUD→USD: latest + ~30 business days history (API omits weekends).
+ * Frankfurter AUD→JPY, AUD→USD: latest + one year of history (API omits weekends).
  * @returns {UseFxRatesResult}
  */
 export function useFXRates() {

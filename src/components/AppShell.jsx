@@ -10,11 +10,13 @@ export function AppShell({ children }) {
       <div
         className="pointer-events-none fixed inset-x-0 top-0 z-[60] lg:hidden"
         style={{
-          height: 'calc(env(safe-area-inset-top, 0px) + 0.65rem)',
+          height: 'calc(env(safe-area-inset-top, 0px) + 3.8rem)',
           background:
-            'linear-gradient(to bottom, rgba(13, 17, 23, 0.86), rgba(13, 17, 23, 0.56), rgba(13, 17, 23, 0))',
+            'linear-gradient(to bottom, rgba(13, 17, 23, 0.88) 0%, rgba(13, 17, 23, 0.70) 34%, rgba(13, 17, 23, 0.34) 62%, rgba(13, 17, 23, 0.10) 82%, rgba(13, 17, 23, 0) 100%)',
           backdropFilter: 'blur(18px) saturate(1.35)',
           WebkitBackdropFilter: 'blur(18px) saturate(1.35)',
+          maskImage: 'linear-gradient(to bottom, black 0%, black 44%, rgba(0,0,0,0.72) 68%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 44%, rgba(0,0,0,0.72) 68%, transparent 100%)',
         }}
         aria-hidden
       />

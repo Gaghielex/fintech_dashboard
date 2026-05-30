@@ -224,6 +224,8 @@ Rules:
 
 #### ME-02 — Converter tab redesign with swipeable rate cards
 
+**Status:** ✅ Implemented
+
 **What:** Redesign the Convert tab rate context section. Replace the current static cards with two swipeable cards: JPY/AUD and USD/AUD.
 
 **Each card contains:**
@@ -257,6 +259,8 @@ Label framing: always presented as rate context, not financial advice. No "buy" 
 **EUR:** EUR/AUD card not included. EUR account is minimal. EUR remains in the converter fields for calculation purposes only.
 
 **API note:** The 30-day historical data fetched for these cards is the same dataset used by HE-01 (historical FX chart). Both features must share a single fetch and cache layer. Do not make duplicate API calls.
+
+**Implementation note:** The rate cards now share the one-year Frankfurter history fetch used by HE-01, with in-card 30d / 90d / 180d / 1Y range controls and guidance framed around converting JPY/USD into AUD.
 
 ---
 
@@ -343,6 +347,8 @@ See HE-05 for full spec. This view slot is active in V2, not a placeholder.
 
 #### HE-01 — Historical FX rate graph (Convert tab)
 
+**Status:** ✅ Implemented
+
 **What:** A full 12-month line chart for JPY/AUD and USD/AUD, pulled from the Frankfurter API historical endpoint. No manual data entry required.
 
 **Data:** Frankfurter `/v1/[start_date]..` endpoint. Fetch on Convert tab load. Cache in session state.
@@ -360,6 +366,8 @@ See HE-05 for full spec. This view slot is active in V2, not a placeholder.
 **Placement:** Below the swipeable rate cards on the Convert tab, or via "View history" tap on a rate card.
 
 **Performance:** ~365 data points per pair. Lightweight for Recharts. Async fetch with skeleton loading state.
+
+**Implementation note:** Merged into the ME-02 swipeable rate cards rather than adding a separate chart section. The cards use the shared one-year FX history cache and expose 30d / 90d / 180d / 1Y range views.
 
 ---
 
@@ -471,12 +479,12 @@ box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset; /* rim light */
 | QW-08 | Number masking | Quick win | -- | ✅ Done |
 | QW-09 | Country flag icons | Quick win | -- | ✅ Done |
 | ME-01 | Bottom nav glass pill + animation | Medium | Design spec | ✅ Done |
-| ME-02 | Converter swipeable rate cards | Medium | Frankfurter historical API, shares fetch with HE-01 | |
+| ME-02 | Converter swipeable rate cards | Medium | Frankfurter historical API, shares fetch with HE-01 | ✅ Done |
 | ME-03 | Three-view geography section | Medium | Recharts (donut), HE-05 (map) | |
 | ME-04 | Net worth delta chip | Medium | Snapshots tab | ✅ Done |
 | ME-05 | Net worth trend chart | Medium | Snapshots tab, ME-04 | ✅ Done |
 | ME-06 | Avatars redesign (G and A) | Medium | Design asset | ✅ Done |
-| HE-01 | Historical FX chart | Higher effort | Frankfurter historical API, shares fetch with ME-02 | |
+| HE-01 | Historical FX chart | Higher effort | Frankfurter historical API, shares fetch with ME-02 | ✅ Done |
 | HE-02 | In-app rate threshold alert | Higher effort | -- | |
 | HE-03 | Nav icons revamp | Higher effort | -- | ✅ Done |
 | HE-04 | Glass card treatment (app-wide) | Higher effort | ME-01 | ✅ Done |

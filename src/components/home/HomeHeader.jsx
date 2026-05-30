@@ -18,7 +18,7 @@ export function HomeHeader() {
             </span>
           </div>
         </div>
-        <h1 className="font-syne mt-2 text-[calc(1.5rem-2pt)] font-extrabold tracking-tight text-ink">
+        <h1 className="font-syne mt-2 text-2xl font-extrabold tracking-tight text-ink">
           Dashboard
         </h1>
         <p className="font-dm-sans mt-0.5 text-xs text-ink-muted">
