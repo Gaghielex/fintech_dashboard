@@ -1,7 +1,5 @@
 import { useNavigation } from '../context/useNavigation.js'
-
-const AVATAR_G_URL = `${import.meta.env.BASE_URL}Avatar-G.png`
-const AVATAR_A_URL = `${import.meta.env.BASE_URL}Avatar-A.png`
+import { JointAvatars } from './home/HouseholdVisuals.jsx'
 
 const tabs = [
   { id: 'home', label: 'Home' },
@@ -71,10 +69,16 @@ export function SideNav() {
   return (
     <aside className="hidden lg:flex lg:w-56 lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:border-r lg:border-border lg:bg-surface/95 lg:backdrop-blur-md">
       {/* Brand */}
-      <div className="flex h-16 items-center gap-2.5 px-5 border-b border-border">
-        <span className="font-syne text-sm font-extrabold tracking-tight text-ink whitespace-nowrap">
-          Doggo Finance
-        </span>
+      <div className="flex h-20 items-center gap-3 px-5 border-b border-border">
+        <JointAvatars size="40" />
+        <div className="flex flex-col leading-none">
+          <span className="font-syne text-base font-extrabold uppercase tracking-tight text-ink">
+            DOGGO
+          </span>
+          <span className="font-syne text-base font-semibold text-ink-muted tracking-[0.18em]">
+            Finance
+          </span>
+        </div>
       </div>
 
       {/* Nav items */}
@@ -108,12 +112,6 @@ export function SideNav() {
         })}
       </nav>
 
-      {/* Household avatars */}
-      <div className="flex items-center gap-2 px-5 py-4 border-t border-border">
-        <img src={AVATAR_G_URL} alt="Gabriel" className="h-8 w-8 rounded-full border-2 border-canvas object-cover" />
-        <img src={AVATAR_A_URL} alt="Ana" className="-ml-2 h-8 w-8 rounded-full border-2 border-surface object-cover" />
-        <span className="font-dm-sans ml-1 text-xs text-ink-muted">Household</span>
-      </div>
     </aside>
   )
 }

@@ -5,17 +5,25 @@ export function HomeHeader() {
   const today = new Date()
 
   return (
-    <header className="mb-5 flex items-start justify-between gap-4 pt-1">
+    <header className="mb-5 flex items-start justify-between gap-4">
       <div>
-        <p className="font-dm-sans text-sm text-ink-muted">
+        <div className="flex items-center gap-2.5">
+          <JointAvatars size="40" />
+          <div className="flex flex-col leading-none">
+            <span className="font-syne text-sm font-extrabold uppercase tracking-tight text-ink">
+              DOGGO
+            </span>
+            <span className="font-syne text-sm font-semibold text-ink-muted tracking-[0.18em]">
+              Finance
+            </span>
+          </div>
+        </div>
+        <h1 className="font-syne mt-2 text-[calc(1.5rem-2pt)] font-extrabold tracking-tight text-ink">
+          Dashboard
+        </h1>
+        <p className="font-dm-sans mt-0.5 text-xs text-ink-muted">
           {formatGreetingDate(today)}
         </p>
-        <h1 className="font-syne mt-1 text-[calc(1.5rem-2pt)] font-extrabold tracking-tight text-ink">
-          Overview
-        </h1>
-      </div>
-      <div className="flex shrink-0 items-center" aria-label="Household">
-        <JointAvatars size="56" />
       </div>
     </header>
   )

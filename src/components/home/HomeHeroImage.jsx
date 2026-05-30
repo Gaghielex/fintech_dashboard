@@ -71,7 +71,7 @@ export function HomeHeroGlassLayer({ children }) {
       style={{ backgroundColor: sheetBg }}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/[0.06] via-white/[0.02] to-transparent" />
-      <div className="relative px-5 pb-3 pt-12 sm:px-6">{children}</div>
+      <div className="relative px-5 pb-3 pt-5 sm:px-6">{children}</div>
     </motion.div>
   )
 }
