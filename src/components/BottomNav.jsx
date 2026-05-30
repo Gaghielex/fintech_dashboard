@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigation } from '../context/useNavigation.js'
 
@@ -66,34 +66,11 @@ const icons = { home: IconHome, accounts: IconAccounts, goals: IconGoals, conver
 
 export function BottomNav() {
   const { tab, setTab, goToAccountsDefault } = useNavigation()
-  const buttonRefs = useRef({})
-  const containerRef = useRef(null)
-  const pillRef = useRef(null)
 
   const switchTo = useCallback((id) => {
     if (id === 'accounts') { goToAccountsDefault(); return }
     setTab(/** @type {any} */ (id))
   }, [setTab, goToAccountsDefault])
-
-  const handleDragEnd = useCallback(() => {
-    if (!pillRef.current) return
-    const pillRect = pillRef.current.getBoundingClientRect()
-    const pillCenter = pillRect.left + pillRect.width / 2
-
-    let nearestId = tab
-    let minDist = Infinity
-    for (const [id, btn] of Object.entries(buttonRefs.current)) {
-      if (!btn) continue
-      const r = btn.getBoundingClientRect()
-      const dist = Math.abs((r.left + r.width / 2) - pillCenter)
-      if (dist < minDist) {
-        minDist = dist
-        nearestId = id
-      }
-    }
-
-    if (nearestId !== tab) switchTo(nearestId)
-  }, [tab, switchTo])
 
   return (
     <nav
@@ -102,8 +79,7 @@ export function BottomNav() {
       aria-label="Main"
     >
       <div
-        ref={containerRef}
-        className="flex w-[calc(100vw-1rem)] max-w-[377px] items-center justify-between gap-1 rounded-full px-[0.7rem] py-[0.6rem]"
+        className="flex w-[calc(100vw-1rem)] max-w-[377px] items-center justify-between gap-1 rounded-full px-[0.7rem] py-[0.72rem]"
         style={{
           background: 'rgba(42, 52, 70, 0.42)',
           backdropFilter: 'blur(28px) saturate(1.6)',
@@ -118,7 +94,6 @@ export function BottomNav() {
           return (
             <button
               key={id}
-              ref={el => { buttonRefs.current[id] = el }}
               type="button"
               onClick={() => switchTo(id)}
               aria-current={active ? 'page' : undefined}
@@ -127,18 +102,12 @@ export function BottomNav() {
               }`}
             >
               <motion.span
-                className="relative flex items-center gap-[0.475rem] rounded-full px-3 py-[0.6rem]"
+                className="relative flex items-center gap-[0.475rem] rounded-full px-3 py-[0.7rem]"
               >
                 {active && (
                   <motion.div
-                    ref={pillRef}
                     layoutId="tab-active-pill"
-                    drag="x"
-                    dragConstraints={containerRef}
-                    dragElastic={0.08}
-                    dragMomentum={false}
-                    onDragEnd={handleDragEnd}
-                    className="absolute inset-0 rounded-full cursor-grab touch-none active:cursor-grabbing"
+                    className="absolute inset-0 rounded-full"
                     style={{
                       background: 'linear-gradient(160deg, rgba(0, 230, 175, 0.28) 0%, rgba(0, 200, 150, 0.10) 55%, rgba(0, 175, 130, 0.18) 100%)',
                       backdropFilter: 'blur(12px)',

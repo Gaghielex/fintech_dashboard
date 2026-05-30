@@ -7,6 +7,17 @@ import { SideNav } from './SideNav.jsx'
 export function AppShell({ children }) {
   return (
     <div className="flex min-h-dvh min-w-0 overflow-x-hidden bg-canvas">
+      <div
+        className="pointer-events-none fixed inset-x-0 top-0 z-[60] lg:hidden"
+        style={{
+          height: 'calc(env(safe-area-inset-top, 0px) + 0.65rem)',
+          background:
+            'linear-gradient(to bottom, rgba(13, 17, 23, 0.86), rgba(13, 17, 23, 0.56), rgba(13, 17, 23, 0))',
+          backdropFilter: 'blur(18px) saturate(1.35)',
+          WebkitBackdropFilter: 'blur(18px) saturate(1.35)',
+        }}
+        aria-hidden
+      />
       <SideNav />
 
       {/* Content + mobile bottom nav */}
