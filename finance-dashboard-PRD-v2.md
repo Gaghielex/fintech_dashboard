@@ -136,6 +136,8 @@ Rules:
 
 #### QW-06 — App logo (Doggo Finance)
 
+**Status:** ✅ Implemented
+
 **What:** Design and implement the Doggo Finance logo/mark in three placements:
 
 1. PWA home screen icon (180x180px square, with safe zone padding)
@@ -464,7 +466,7 @@ box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.08) inset; /* rim light */
 | QW-03 | Bank / goal logos via icon_url | Quick win | Schema update (icon_url) | ✅ Done |
 | QW-04 | Fortnightly update reminder | Quick win | -- | ✅ Done |
 | QW-05 | Draggable goals | Quick win | -- | ✅ Done |
-| QW-06 | App logo (Doggo Finance) | Quick win | Design asset | |
+| QW-06 | App logo (Doggo Finance) | Quick win | Design asset | ✅ Done |
 | QW-07 | Search on Accounts tab | Quick win | -- | ✅ Done |
 | QW-08 | Number masking | Quick win | -- | ✅ Done |
 | QW-09 | Country flag icons | Quick win | -- | ✅ Done |

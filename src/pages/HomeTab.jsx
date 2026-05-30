@@ -153,7 +153,6 @@ export function HomeTab({
           <FreshnessBar
             globalLastUpdated={metrics.globalLastUpdated}
             staleThresholdDays={metrics.staleThresholdDays}
-            fxDateLabel={fxDateLabel}
           />
         </motion.div>
       </HomeHeroGlassLayer>

@@ -57,9 +57,9 @@ export function formatMoneyParts(amount, currency, opts = {}) {
  */
 export function formatGreetingDate(d) {
   return new Intl.DateTimeFormat('en-AU', {
-    weekday: 'long',
+    weekday: 'short',
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   }).format(d)
 }

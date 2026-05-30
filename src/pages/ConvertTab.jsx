@@ -64,27 +64,24 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
   const usdSpot = latestRates?.USD ?? 0
 
   return (
-    <div className="flex flex-col space-y-6 pb-6 pt-8">
-      <header className="space-y-2">
+    <div className="flex flex-col space-y-6 pb-6 pt-8 px-5">
+      <header className="space-y-3">
         <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
           Convert
         </h1>
-        <p className="font-dm-sans text-sm text-ink-muted">
-          Tri-currency workspace using Frankfurter spot rates.
-        </p>
-        <p
-          className="font-dm-mono text-[11px] leading-tight"
-          aria-live="polite"
-        >
-          {ratesReady ? (
-            <span className="text-positive">Live rates</span>
-          ) : fx.loading ? (
-            <span className="text-ink-muted">Loading…</span>
-          ) : (
-            <span className="text-warning">Rates unavailable</span>
-          )}
-          <span className="text-ink-muted"> · {updatedLabel}</span>
-        </p>
+        <div className="rounded-xl border border-white/10 bg-gradient-to-r from-violet-500/25 via-pink-500/20 to-orange-400/25 px-4 py-3">
+          <p className="font-dm-sans font-semibold text-white/90 text-xs">
+            FX Rates
+          </p>
+          <p className="font-dm-mono mt-0.5 text-xs leading-relaxed text-white/70" aria-live="polite">
+            {ratesReady
+              ? `1 AUD = ${jpySpot.toFixed(2)} JPY · ${usdSpot.toFixed(4)} USD`
+              : fx.loading ? 'Loading…' : 'Rates unavailable'}
+            {ratesReady && (
+              <span className="text-white/50"> · {updatedLabel}</span>
+            )}
+          </p>
+        </div>
       </header>
 
       {!ratesReady && !fx.loading ? (

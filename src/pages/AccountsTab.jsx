@@ -608,7 +608,7 @@ export function AccountsTab({
   }
 
   return (
-    <div className="space-y-4 pb-6 pt-8">
+    <div className="space-y-4 pb-6 pt-8 px-5">
       <header>
         <h1 className="font-syne text-2xl font-extrabold tracking-tight text-ink">
           Accounts

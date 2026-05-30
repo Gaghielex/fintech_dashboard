@@ -133,7 +133,7 @@ export function HomeHeroSection({
           className="overflow-hidden rounded-2xl border glass-card"
           style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
         >
-          <div className="px-6 pb-5 pt-6 sm:px-7">
+          <div className="px-6 pb-7 pt-8 sm:px-7">
             <div className="flex items-center justify-between">
               <p className="font-dm-sans text-xs font-medium uppercase tracking-wider text-ink-muted">
                 Household net worth
@@ -182,7 +182,6 @@ export function HomeHeroSection({
                   {delta.pct != null && (
                     <span className="opacity-75">({delta.positive ? '+' : ''}{delta.pct.toFixed(1)}%)</span>
                   )}
-                  {delta.sinceLabel && <span className="opacity-60">since {delta.sinceLabel}</span>}
                 </button>
               </div>
             ) : null}
@@ -257,7 +256,7 @@ export function HomeHeroSection({
 
 function BreakdownCol({ label, valueAud, ready, dotClass, maskStyle }) {
   return (
-    <div className="flex min-w-0 flex-col items-center px-3 py-4 text-center sm:px-4">
+    <div className="flex min-w-0 flex-col items-center px-3 py-5 text-center sm:px-4">
       <span className="font-dm-mono text-sm font-bold tabular-nums text-ink" style={maskStyle}>
         {ready ? formatMoney(valueAud, 'AUD', { maxFractionDigits: 0 }) : '—'}
       </span>

@@ -31,7 +31,7 @@ export function GeographySection({
   return (
     <section className="mb-8">
       <h2 className={HOME_SECTION_TITLE_CLASS}>Where is our money?</h2>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3">
         <GeographyTile
           flag={GEO_FLAGS.AU}
           title="Australia"

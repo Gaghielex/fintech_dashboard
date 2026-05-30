@@ -2,13 +2,11 @@
  * @param {{
  *   globalLastUpdated: string | null,
  *   staleThresholdDays: number,
- *   fxDateLabel: string | null,
  * }} props
  */
 export function FreshnessBar({
   globalLastUpdated,
   staleThresholdDays,
-  fxDateLabel,
 }) {
   let message = 'No account last_updated values found in the sheet.'
   let stale = false
@@ -35,12 +33,6 @@ export function FreshnessBar({
         </span>
         <br />
         {message}
-        {fxDateLabel ? (
-          <>
-            <br />
-            <span className="text-white/50">FX: {fxDateLabel}</span>
-          </>
-        ) : null}
       </p>
     </footer>
   )

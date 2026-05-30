@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 /** Damped pull distance (px) needed to trigger a refresh. */
-const THRESHOLD = 72
+const THRESHOLD = 120
 
 /**
  * Detects a pull-down-to-refresh gesture when the page is scrolled to the

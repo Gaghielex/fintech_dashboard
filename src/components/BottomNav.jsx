@@ -1,3 +1,4 @@
+import { useCallback, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigation } from '../context/useNavigation.js'
 
@@ -65,14 +66,43 @@ const icons = { home: IconHome, accounts: IconAccounts, goals: IconGoals, conver
 
 export function BottomNav() {
   const { tab, setTab, goToAccountsDefault } = useNavigation()
+  const buttonRefs = useRef({})
+  const containerRef = useRef(null)
+  const pillRef = useRef(null)
+
+  const switchTo = useCallback((id) => {
+    if (id === 'accounts') { goToAccountsDefault(); return }
+    setTab(/** @type {any} */ (id))
+  }, [setTab, goToAccountsDefault])
+
+  const handleDragEnd = useCallback(() => {
+    if (!pillRef.current) return
+    const pillRect = pillRef.current.getBoundingClientRect()
+    const pillCenter = pillRect.left + pillRect.width / 2
+
+    let nearestId = tab
+    let minDist = Infinity
+    for (const [id, btn] of Object.entries(buttonRefs.current)) {
+      if (!btn) continue
+      const r = btn.getBoundingClientRect()
+      const dist = Math.abs((r.left + r.width / 2) - pillCenter)
+      if (dist < minDist) {
+        minDist = dist
+        nearestId = id
+      }
+    }
+
+    if (nearestId !== tab) switchTo(nearestId)
+  }, [tab, switchTo])
 
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-50 flex justify-center lg:hidden"
-      style={{ paddingBottom: 'max(0.55rem, calc(env(safe-area-inset-bottom) + 0.2rem))' }}
+      style={{ paddingBottom: 'max(12px, calc(env(safe-area-inset-bottom) - 2px))' }}
       aria-label="Main"
     >
       <div
+        ref={containerRef}
         className="flex w-[calc(100vw-1rem)] max-w-[377px] items-center justify-between gap-1 rounded-full px-[0.7rem] py-[0.6rem]"
         style={{
           background: 'rgba(42, 52, 70, 0.42)',
@@ -85,45 +115,60 @@ export function BottomNav() {
         {tabs.map(({ id, label }) => {
           const active = tab === id
           const Icon = icons[id]
-          const onActivate = () => {
-            if (id === 'accounts') { goToAccountsDefault(); return }
-            setTab(/** @type {any} */ (id))
-          }
           return (
             <button
               key={id}
+              ref={el => { buttonRefs.current[id] = el }}
               type="button"
-              onClick={onActivate}
+              onClick={() => switchTo(id)}
               aria-current={active ? 'page' : undefined}
-              className="relative flex items-center gap-[0.475rem] rounded-full px-4 py-[0.6rem] outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className={`relative flex items-center justify-center overflow-visible rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
+                active ? 'shrink-0' : 'w-13 shrink-0'
+              }`}
             >
-              {active && (
-                <motion.div
-                  layoutId="tab-active-pill"
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: 'rgba(0, 200, 150, 0.12)',
-                    border: '1px solid rgba(0, 200, 150, 0.22)',
-                    boxShadow: '0 0 18px rgba(0, 200, 150, 0.22), 0 0 36px rgba(0, 200, 150, 0.12)',
-                  }}
-                  transition={{ type: 'spring', stiffness: 420, damping: 46, mass: 0.8 }}
-                />
-              )}
-
-              <span className="relative z-10">
-                <Icon active={active} />
-              </span>
-
               <motion.span
-                animate={{
-                  maxWidth: active ? 138 : 0,
-                  opacity: active ? 1 : 0,
-                }}
-                transition={{ type: 'spring', stiffness: 420, damping: 46, mass: 0.8 }}
-                className="relative z-10 overflow-hidden whitespace-nowrap font-dm-sans text-[1.07rem] font-semibold text-primary"
-                aria-hidden={!active}
+                className="relative flex items-center gap-[0.475rem] rounded-full px-3 py-[0.6rem]"
               >
-                {label}
+                {active && (
+                  <motion.div
+                    ref={pillRef}
+                    layoutId="tab-active-pill"
+                    drag="x"
+                    dragConstraints={containerRef}
+                    dragElastic={0.08}
+                    dragMomentum={false}
+                    onDragEnd={handleDragEnd}
+                    className="absolute inset-0 rounded-full cursor-grab touch-none active:cursor-grabbing"
+                    style={{
+                      background: 'linear-gradient(160deg, rgba(0, 230, 175, 0.28) 0%, rgba(0, 200, 150, 0.10) 55%, rgba(0, 175, 130, 0.18) 100%)',
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(0, 210, 160, 0.30)',
+                      boxShadow: [
+                        'inset 0 1.5px 0 rgba(255, 255, 255, 0.50)',
+                        'inset 1px 0 0 rgba(255, 255, 255, 0.18)',
+                        'inset -1px 0 0 rgba(255, 255, 255, 0.10)',
+                        'inset 0 -1px 0 rgba(0, 0, 0, 0.12)',
+                        '0 4px 16px rgba(0, 200, 150, 0.22)',
+                        '0 1px 4px rgba(0, 0, 0, 0.25)',
+                      ].join(', '),
+                    }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 46, mass: 0.8 }}
+                  />
+                )}
+
+                <span className="relative z-10 pointer-events-none">
+                  <Icon active={active} />
+                </span>
+
+                <motion.span
+                  animate={{ width: active ? 'auto' : 0, opacity: active ? 1 : 0 }}
+                  transition={{ type: 'spring', stiffness: 420, damping: 46, mass: 0.8 }}
+                  className="relative z-10 overflow-hidden whitespace-nowrap font-dm-sans text-[1.07rem] font-semibold text-primary pointer-events-none"
+                  aria-hidden={!active}
+                >
+                  {label}
+                </motion.span>
               </motion.span>
             </button>
           )
