@@ -5,6 +5,7 @@ const NetWorthChart = lazy(() =>
   import('./NetWorthChart.jsx').then(m => ({ default: m.NetWorthChart }))
 )
 import { formatMoney } from '../../utils/formatCurrency.js'
+import { filterByDateRange } from '../../utils/filterByDateRange.js'
 import { useCountUp } from '../../hooks/useCountUp.js'
 
 const HERO_AMOUNT = 'clamp(2rem, 8vw, 3rem)'
@@ -107,15 +108,11 @@ export function HomeHeroSection({
 
   const chartData = useMemo(() => {
     const range = TIME_RANGES.find(r => r.key === timeRange)
-    const cutoff = range?.days ? Date.now() - range.days * 86400000 : 0
-    return netWorthSnapshots
-      .filter(s => s.date && s.total_aud != null)
-      .filter(s => !cutoff || new Date(s.date).getTime() >= cutoff)
-      .sort((a, b) => (a.date > b.date ? 1 : -1))
-      .map(s => ({
-        label: new Date(s.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }),
-        total: s.total_aud,
-      }))
+    const valid = netWorthSnapshots.filter(s => s.date && s.total_aud != null)
+    return filterByDateRange(valid, range?.days ?? null).map(s => ({
+      label: new Date(`${s.date}T00:00:00`).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' }),
+      total: s.total_aud,
+    }))
   }, [netWorthSnapshots, timeRange])
 
   const hasChart = chartData.length >= 2

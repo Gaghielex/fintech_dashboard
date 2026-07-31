@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import {
   computeFxTrend,
   describeFxRangePosition,
@@ -6,15 +7,15 @@ import { FlagBadge } from '../home/HouseholdVisuals.jsx'
 
 function formatShortDate(date) {
   if (!date) return ''
-  return new Date(date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
+  return new Date(`${date}T00:00:00`).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
 }
 
-function Sparkline({ points, quoteKey, decimals }) {
+function Sparkline({ points, decimals, gradientId }) {
   const width = 320
   const height = 132
   const pad = { top: 8, right: 44, bottom: 24, left: 8 }
   const series = points
-    .map((p) => ({ date: p.date, value: Number(p[quoteKey]) || 0 }))
+    .map((p) => ({ date: p.date, value: Number(p.value) || 0 }))
     .filter((p) => p.date && p.value > 0)
   const nums = series.map((p) => p.value)
   const min = nums.length ? Math.min(...nums) : 0
@@ -41,7 +42,7 @@ function Sparkline({ points, quoteKey, decimals }) {
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="h-32 w-full overflow-visible" aria-hidden>
       <defs>
-        <linearGradient id="fxSparkFill" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#00c896" stopOpacity="0.18" />
           <stop offset="100%" stopColor="#00c896" stopOpacity="0" />
         </linearGradient>
@@ -77,7 +78,7 @@ function Sparkline({ points, quoteKey, decimals }) {
       })}
       <polyline
         points={`${svgPoints[0]} ${svgPoints.join(' ')} ${svgPoints[svgPoints.length - 1].split(',')[0]},${chartBottom} ${svgPoints[0].split(',')[0]},${chartBottom}`}
-        fill="url(#fxSparkFill)"
+        fill={`url(#${gradientId})`}
         stroke="none"
       />
       <polyline
@@ -92,18 +93,40 @@ function Sparkline({ points, quoteKey, decimals }) {
   )
 }
 
-function PairFlags({ quoteKey }) {
+function PairFlags({ quoteKey, inverted }) {
   const quoteFlag = quoteKey === 'JPY' ? 'jp' : 'us'
   const quoteLabel = quoteKey === 'JPY' ? 'Japan' : 'United States'
+  const front = inverted
+    ? { flag: 'au', label: 'Australia' }
+    : { flag: quoteFlag, label: quoteLabel }
+  const back = inverted
+    ? { flag: quoteFlag, label: quoteLabel }
+    : { flag: 'au', label: 'Australia' }
+
   return (
-    <div className="relative h-8 w-12 shrink-0" aria-hidden>
+    <div className="relative h-6 w-11 shrink-0" aria-hidden>
       <span className="absolute left-0 top-0">
-        <FlagBadge flag={quoteFlag} label={quoteLabel} />
+        <FlagBadge flag={front.flag} label={front.label} />
       </span>
       <span className="absolute left-5 top-0">
-        <FlagBadge flag="au" label="Australia" />
+        <FlagBadge flag={back.flag} label={back.label} />
       </span>
     </div>
+  )
+}
+
+function FlipIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M7 10h14l-4-4m0 8H3l4 4"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   )
 }
 
@@ -117,6 +140,8 @@ function PairFlags({ quoteKey }) {
  *   ratesReady: boolean,
  *   rangeKey: '30d' | '90d' | '180d' | '1y',
  *   onRangeChange: (range: '30d' | '90d' | '180d' | '1y') => void,
+ *   inverted?: boolean,
+ *   onToggleInvert?: () => void,
  * }} props
  */
 export function RateContextCard({
@@ -128,17 +153,53 @@ export function RateContextCard({
   ratesReady,
   rangeKey,
   onRangeChange,
+  inverted = false,
+  onToggleInvert,
 }) {
-  const stats = computeFxTrend(points, quoteKey, latestRate)
-  const positionLabel = describeFxRangePosition(stats.position)
+  // Guidance always uses native foreign-per-AUD quote (best time to convert into AUD).
+  const guidance = computeFxTrend(points, quoteKey, latestRate)
   const signalClass =
-    stats.tone === 'low'
+    guidance.tone === 'low'
       ? 'border-primary/15 bg-primary/8 text-primary'
-      : stats.tone === 'high'
+      : guidance.tone === 'high'
         ? 'border-accent-gold/20 bg-accent-gold/10 text-accent-gold'
         : 'border-white/10 bg-surface-1/55 text-ink-muted'
 
-  const decimals = quoteKey === 'JPY' ? 2 : 4
+  const displayPoints = useMemo(
+    () =>
+      points
+        .map((p) => {
+          const raw = Number(p[quoteKey]) || 0
+          return {
+            date: p.date,
+            value: inverted && raw > 0 ? 1 / raw : raw,
+          }
+        })
+        .filter((p) => p.value > 0),
+    [points, quoteKey, inverted],
+  )
+
+  const displayRate = inverted && latestRate > 0 ? 1 / latestRate : latestRate
+  const displayStats = useMemo(() => {
+    const vals = displayPoints.map((p) => p.value)
+    if (!vals.length) {
+      return { min: displayRate, max: displayRate, current: displayRate, position: 0.5 }
+    }
+    const min = Math.min(...vals)
+    const max = Math.max(...vals)
+    let position = 0.5
+    if (max > min) position = Math.min(1, Math.max(0, (displayRate - min) / (max - min)))
+    return { min, max, current: displayRate, position }
+  }, [displayPoints, displayRate])
+
+  const positionLabel = describeFxRangePosition(displayStats.position)
+  const decimals = inverted ? (quoteKey === 'JPY' ? 5 : 4) : quoteKey === 'JPY' ? 2 : 4
+  const displayTitle = inverted
+    ? `AUD / ${quoteKey}`
+    : title
+  const displaySubtitle = inverted
+    ? `Australian dollars per one ${quoteKey === 'JPY' ? 'yen' : 'US dollar'}`
+    : subtitle
 
   return (
     <section
@@ -151,10 +212,26 @@ export function RateContextCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-syne text-lg font-bold text-ink">{title}</h3>
-          <p className="font-dm-sans mt-0.5 text-xs text-ink-muted">{subtitle}</p>
+          <h3 className="font-syne text-lg font-bold text-ink">{displayTitle}</h3>
+          <p className="font-dm-sans mt-0.5 text-xs text-ink-muted">{displaySubtitle}</p>
         </div>
-        <PairFlags quoteKey={quoteKey} />
+        <div className="mt-1 flex h-6 shrink-0 items-center gap-2">
+          {onToggleInvert ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation()
+                onToggleInvert()
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              className="inline-flex h-6 w-6 items-center justify-center text-ink-muted transition hover:text-ink"
+              aria-label={inverted ? `Show ${quoteKey} per AUD` : `Show AUD per ${quoteKey}`}
+            >
+              <FlipIcon />
+            </button>
+          ) : null}
+          <PairFlags quoteKey={quoteKey} inverted={inverted} />
+        </div>
       </div>
 
       <div className="mt-3 flex gap-1.5">
@@ -167,7 +244,11 @@ export function RateContextCard({
           <button
             key={key}
             type="button"
-            onClick={() => onRangeChange(/** @type {'30d'|'90d'|'180d'|'1y'} */ (key))}
+            onClick={(e) => {
+              e.stopPropagation()
+              onRangeChange(/** @type {'30d'|'90d'|'180d'|'1y'} */ (key))
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
             className={`font-dm-mono rounded-full px-2.5 py-1 text-[10px] transition ${
               rangeKey === key
                 ? 'bg-primary/20 text-primary'
@@ -180,23 +261,26 @@ export function RateContextCard({
       </div>
 
       <p className="font-dm-mono mt-4 text-4xl font-medium leading-none tabular-nums text-ink">
-        {ratesReady ? stats.current.toFixed(decimals) : '—'}
+        {ratesReady ? displayStats.current.toFixed(decimals) : '—'}
       </p>
 
       <div className="mt-3">
-        <Sparkline points={points} quoteKey={quoteKey} decimals={decimals} />
+        <Sparkline
+          points={displayPoints}
+          decimals={decimals}
+          gradientId={`fxSparkFill-${quoteKey}-${inverted ? 'inv' : 'nat'}`}
+        />
       </div>
 
       <p className={`font-dm-sans mt-3 rounded-xl border px-3 py-2 text-xs leading-snug ${signalClass}`}>
-        {ratesReady ? stats.label : 'Waiting for rate history...'}
+        {ratesReady ? guidance.label : 'Waiting for rate history...'}
       </p>
 
       <div className="mt-3 grid grid-cols-3 gap-2">
-        <RangeStat label="Min" value={ratesReady ? stats.min.toFixed(decimals) : '—'} />
-        <RangeStat label="Max" value={ratesReady ? stats.max.toFixed(decimals) : '—'} />
+        <RangeStat label="Min" value={ratesReady ? displayStats.min.toFixed(decimals) : '—'} />
+        <RangeStat label="Max" value={ratesReady ? displayStats.max.toFixed(decimals) : '—'} />
         <RangeStat label="Now" value={ratesReady ? positionLabel : '—'} />
       </div>
-
     </section>
   )
 }

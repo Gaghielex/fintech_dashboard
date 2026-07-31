@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useDragControls } from 'framer-motion'
 import { BalanceShortcutPills } from '../components/convert/BalanceShortcutPills.jsx'
 import { RateContextCard } from '../components/convert/RateContextCard.jsx'
 import { TriCurrencyFields } from '../components/convert/TriCurrencyFields.jsx'
 import { getConvertShortcutAmounts } from '../utils/convertShortcutBalances.js'
+import { filterByDateRange } from '../utils/filterByDateRange.js'
 import { recalcTriFromActive } from '../utils/triCurrencyConvert.js'
 
 const HISTORY_RANGES = {
@@ -12,6 +13,8 @@ const HISTORY_RANGES = {
   '180d': 180,
   '1y': 365,
 }
+
+const CARD_GAP_PX = 16
 
 /**
  * @param {{
@@ -34,10 +37,32 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
   const [amounts, setAmounts] = useState({ aud: 0, jpy: 0, usd: 0 })
   const [rateCardIndex, setRateCardIndex] = useState(0)
   const [historyRange, setHistoryRange] = useState(/** @type {'30d'|'90d'|'180d'|'1y'} */ ('30d'))
+  const [invertedByPair, setInvertedByPair] = useState(
+    /** @type {Record<'JPY'|'USD', boolean>} */ ({ JPY: false, USD: false }),
+  )
   const [active, setActive] = useState(
     /** @type {'AUD'|'JPY'|'USD'} */ ('AUD'),
   )
   const [syncKey, setSyncKey] = useState(0)
+  const [trackWidth, setTrackWidth] = useState(0)
+  const trackRef = useRef(/** @type {HTMLDivElement | null} */ (null))
+  const trackWidthRef = useRef(0)
+  const dragControls = useDragControls()
+
+  useEffect(() => {
+    const el = trackRef.current
+    if (!el) return undefined
+    const measure = () => {
+      const next = el.clientWidth
+      if (next <= 0 || next === trackWidthRef.current) return
+      trackWidthRef.current = next
+      setTrackWidth(next)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   const ratesReady = Boolean(
     latestRates && latestRates.JPY > 0 && latestRates.USD > 0,
@@ -47,10 +72,10 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
   const visiblePoints = useMemo(() => {
     if (!points.length) return []
     const latestPoint = points.at(-1)
-    const latestDate = latestPoint?.date ? new Date(latestPoint.date) : new Date()
-    const cutoff = new Date(latestDate)
-    cutoff.setDate(cutoff.getDate() - HISTORY_RANGES[historyRange])
-    return points.filter((point) => new Date(point.date).getTime() >= cutoff.getTime())
+    const endDate = latestPoint?.date
+      ? new Date(`${latestPoint.date}T00:00:00`)
+      : new Date()
+    return filterByDateRange(points, HISTORY_RANGES[historyRange], endDate)
   }, [points, historyRange])
 
   const shortcuts = useMemo(
@@ -98,15 +123,27 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
   const onRateDragEnd = (_, info) => {
     const offset = info.offset.x
     const velocity = info.velocity.x
-    if (offset < -60 || velocity < -520) {
+    if (offset < -80 || velocity < -600) {
       setRateCardIndex((i) => Math.min(rateCards.length - 1, i + 1))
-    } else if (offset > 60 || velocity > 520) {
+    } else if (offset > 80 || velocity > 600) {
       setRateCardIndex((i) => Math.max(0, i - 1))
     }
   }
 
+  const startRateDrag = (event) => {
+    const target = /** @type {HTMLElement | null} */ (event.target)
+    if (target?.closest?.('button, a, input, textarea, [role="button"]')) return
+    dragControls.start(event)
+  }
+
   const showPrevRateCard = () => setRateCardIndex((i) => Math.max(0, i - 1))
   const showNextRateCard = () => setRateCardIndex((i) => Math.min(rateCards.length - 1, i + 1))
+  const toggleInvert = (quoteKey) => {
+    setInvertedByPair((prev) => ({ ...prev, [quoteKey]: !prev[quoteKey] }))
+  }
+
+  const width = trackWidth || trackWidthRef.current
+  const slideX = width > 0 ? -(rateCardIndex * (width + CARD_GAP_PX)) : 0
 
   return (
     <div className="flex flex-col space-y-6 pb-6 pt-8 px-5">
@@ -159,19 +196,30 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
           ›
         </button>
 
-        <div className="overflow-hidden">
+        <div
+          ref={trackRef}
+          className="overflow-hidden"
+          onPointerDown={startRateDrag}
+        >
           <motion.div
-            className="flex gap-4"
-            animate={{ x: `calc(${rateCardIndex * -100}% - ${rateCardIndex}rem)` }}
+            className="flex"
+            style={{ gap: CARD_GAP_PX, width: width > 0 ? width * rateCards.length + CARD_GAP_PX * (rateCards.length - 1) : undefined }}
+            animate={{ x: slideX }}
             transition={{ type: 'spring', stiffness: 180, damping: 28, mass: 0.95 }}
             drag="x"
+            dragControls={dragControls}
+            dragListener={false}
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.18}
             dragMomentum={false}
             onDragEnd={onRateDragEnd}
           >
             {rateCards.map((card) => (
-              <div key={card.quoteKey} className="min-w-full">
+              <div
+                key={card.quoteKey}
+                className="shrink-0"
+                style={{ width: width > 0 ? width : '100%' }}
+              >
                 <RateContextCard
                   title={card.title}
                   subtitle={card.subtitle}
@@ -181,6 +229,8 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
                   ratesReady={ratesReady}
                   rangeKey={historyRange}
                   onRangeChange={setHistoryRange}
+                  inverted={invertedByPair[card.quoteKey]}
+                  onToggleInvert={() => toggleInvert(card.quoteKey)}
                 />
               </div>
             ))}

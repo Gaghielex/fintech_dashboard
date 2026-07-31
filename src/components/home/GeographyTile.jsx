@@ -82,7 +82,7 @@ export function GeographyTile({
     <motion.div
       whileTap={{ opacity: 0.72 }}
       transition={{ duration: 0.1 }}
-      className={`cursor-pointer rounded-xl border p-3 text-left outline-none backdrop-blur-xl transition-colors focus-visible:ring-2 focus-visible:ring-primary/40 aspect-square flex flex-col ${
+      className={`cursor-pointer rounded-xl border p-3 text-left outline-none backdrop-blur-xl transition-colors focus-visible:ring-2 focus-visible:ring-primary/40 min-h-[10.5rem] md:min-h-[9.5rem] flex flex-col ${
         isRetirement
           ? 'border-accent-gold/50'
           : 'border-white/[0.06]'
