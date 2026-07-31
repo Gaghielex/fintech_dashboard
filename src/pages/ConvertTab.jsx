@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { motion, useDragControls } from 'framer-motion'
 import { BalanceShortcutPills } from '../components/convert/BalanceShortcutPills.jsx'
 import { RateContextCard } from '../components/convert/RateContextCard.jsx'
 import { TriCurrencyFields } from '../components/convert/TriCurrencyFields.jsx'
@@ -15,6 +14,10 @@ const HISTORY_RANGES = {
 }
 
 const CARD_GAP_PX = 16
+
+function slideStride(scroller) {
+  return scroller.clientWidth + CARD_GAP_PX
+}
 
 /**
  * @param {{
@@ -44,25 +47,44 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
     /** @type {'AUD'|'JPY'|'USD'} */ ('AUD'),
   )
   const [syncKey, setSyncKey] = useState(0)
-  const [trackWidth, setTrackWidth] = useState(0)
-  const trackRef = useRef(/** @type {HTMLDivElement | null} */ (null))
-  const trackWidthRef = useRef(0)
-  const dragControls = useDragControls()
+  const scrollerRef = useRef(/** @type {HTMLDivElement | null} */ (null))
+  const scrollingFromUi = useRef(false)
+  const rateCardIndexRef = useRef(0)
+  rateCardIndexRef.current = rateCardIndex
+
+  const scrollToCard = (index, smooth = true) => {
+    const el = scrollerRef.current
+    if (!el) return
+    scrollingFromUi.current = true
+    el.scrollTo({
+      left: index * slideStride(el),
+      behavior: smooth ? 'smooth' : 'auto',
+    })
+    window.setTimeout(() => {
+      scrollingFromUi.current = false
+    }, smooth ? 420 : 0)
+  }
 
   useEffect(() => {
-    const el = trackRef.current
+    const el = scrollerRef.current
     if (!el) return undefined
-    const measure = () => {
-      const next = el.clientWidth
-      if (next <= 0 || next === trackWidthRef.current) return
-      trackWidthRef.current = next
-      setTrackWidth(next)
+    const syncWidth = () => {
+      el.scrollTo({ left: rateCardIndexRef.current * slideStride(el), behavior: 'auto' })
     }
-    measure()
-    const ro = new ResizeObserver(measure)
+    const ro = new ResizeObserver(syncWidth)
     ro.observe(el)
     return () => ro.disconnect()
   }, [])
+
+  const onScrollerScroll = () => {
+    const el = scrollerRef.current
+    if (!el || scrollingFromUi.current) return
+    const stride = slideStride(el)
+    if (stride <= 0) return
+    const next = Math.round(el.scrollLeft / stride)
+    const clamped = Math.max(0, Math.min(1, next))
+    setRateCardIndex((i) => (i === clamped ? i : clamped))
+  }
 
   const ratesReady = Boolean(
     latestRates && latestRates.JPY > 0 && latestRates.USD > 0,
@@ -120,30 +142,23 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
     },
   ]
 
-  const onRateDragEnd = (_, info) => {
-    const offset = info.offset.x
-    const velocity = info.velocity.x
-    if (offset < -80 || velocity < -600) {
-      setRateCardIndex((i) => Math.min(rateCards.length - 1, i + 1))
-    } else if (offset > 80 || velocity > 600) {
-      setRateCardIndex((i) => Math.max(0, i - 1))
-    }
+  const showPrevRateCard = () => {
+    const next = Math.max(0, rateCardIndex - 1)
+    setRateCardIndex(next)
+    scrollToCard(next)
   }
-
-  const startRateDrag = (event) => {
-    const target = /** @type {HTMLElement | null} */ (event.target)
-    if (target?.closest?.('button, a, input, textarea, [role="button"]')) return
-    dragControls.start(event)
+  const showNextRateCard = () => {
+    const next = Math.min(rateCards.length - 1, rateCardIndex + 1)
+    setRateCardIndex(next)
+    scrollToCard(next)
   }
-
-  const showPrevRateCard = () => setRateCardIndex((i) => Math.max(0, i - 1))
-  const showNextRateCard = () => setRateCardIndex((i) => Math.min(rateCards.length - 1, i + 1))
+  const goToRateCard = (index) => {
+    setRateCardIndex(index)
+    scrollToCard(index)
+  }
   const toggleInvert = (quoteKey) => {
     setInvertedByPair((prev) => ({ ...prev, [quoteKey]: !prev[quoteKey] }))
   }
-
-  const width = trackWidth || trackWidthRef.current
-  const slideX = width > 0 ? -(rateCardIndex * (width + CARD_GAP_PX)) : 0
 
   return (
     <div className="flex flex-col space-y-6 pb-6 pt-8 px-5">
@@ -177,71 +192,59 @@ export function ConvertTab({ accounts, settings, latestRates, fx }) {
       />
 
       <div className="relative">
-        <button
-          type="button"
-          onClick={showPrevRateCard}
-          disabled={rateCardIndex === 0}
-          className="font-dm-sans absolute -left-3 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-surface/80 text-xl text-ink shadow-lg backdrop-blur-md transition hover:bg-surface-1 disabled:cursor-default disabled:opacity-25 lg:flex"
-          aria-label="Previous rate card"
-        >
-          ‹
-        </button>
-        <button
-          type="button"
-          onClick={showNextRateCard}
-          disabled={rateCardIndex === rateCards.length - 1}
-          className="font-dm-sans absolute -right-3 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-surface/80 text-xl text-ink shadow-lg backdrop-blur-md transition hover:bg-surface-1 disabled:cursor-default disabled:opacity-25 lg:flex"
-          aria-label="Next rate card"
-        >
-          ›
-        </button>
+        {rateCardIndex > 0 ? (
+          <button
+            type="button"
+            onClick={showPrevRateCard}
+            className="font-dm-sans absolute -left-3 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-surface/80 text-xl text-ink shadow-lg backdrop-blur-md transition hover:bg-surface-1 lg:flex"
+            aria-label="Previous rate card"
+          >
+            ‹
+          </button>
+        ) : null}
+        {rateCardIndex < rateCards.length - 1 ? (
+          <button
+            type="button"
+            onClick={showNextRateCard}
+            className="font-dm-sans absolute -right-3 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/10 bg-surface/80 text-xl text-ink shadow-lg backdrop-blur-md transition hover:bg-surface-1 lg:flex"
+            aria-label="Next rate card"
+          >
+            ›
+          </button>
+        ) : null}
 
         <div
-          ref={trackRef}
-          className="overflow-hidden"
-          onPointerDown={startRateDrag}
+          ref={scrollerRef}
+          onScroll={onScrollerScroll}
+          className="flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
-          <motion.div
-            className="flex"
-            style={{ gap: CARD_GAP_PX, width: width > 0 ? width * rateCards.length + CARD_GAP_PX * (rateCards.length - 1) : undefined }}
-            animate={{ x: slideX }}
-            transition={{ type: 'spring', stiffness: 180, damping: 28, mass: 0.95 }}
-            drag="x"
-            dragControls={dragControls}
-            dragListener={false}
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.18}
-            dragMomentum={false}
-            onDragEnd={onRateDragEnd}
-          >
-            {rateCards.map((card) => (
-              <div
-                key={card.quoteKey}
-                className="shrink-0"
-                style={{ width: width > 0 ? width : '100%' }}
-              >
-                <RateContextCard
-                  title={card.title}
-                  subtitle={card.subtitle}
-                  quoteKey={card.quoteKey}
-                  latestRate={card.latestRate}
-                  points={visiblePoints}
-                  ratesReady={ratesReady}
-                  rangeKey={historyRange}
-                  onRangeChange={setHistoryRange}
-                  inverted={invertedByPair[card.quoteKey]}
-                  onToggleInvert={() => toggleInvert(card.quoteKey)}
-                />
-              </div>
-            ))}
-          </motion.div>
+          {rateCards.map((card) => (
+            <div
+              key={card.quoteKey}
+              className="w-full min-w-full shrink-0 snap-start"
+            >
+              <RateContextCard
+                title={card.title}
+                subtitle={card.subtitle}
+                quoteKey={card.quoteKey}
+                latestRate={card.latestRate}
+                points={visiblePoints}
+                ratesReady={ratesReady}
+                rangeKey={historyRange}
+                onRangeChange={setHistoryRange}
+                inverted={invertedByPair[card.quoteKey]}
+                onToggleInvert={() => toggleInvert(card.quoteKey)}
+              />
+            </div>
+          ))}
         </div>
         <div className="mt-3 flex justify-center gap-1.5" aria-label="Rate card pagination">
           {rateCards.map((card, index) => (
             <button
               key={card.quoteKey}
               type="button"
-              onClick={() => setRateCardIndex(index)}
+              onClick={() => goToRateCard(index)}
               className={`h-1.5 rounded-full transition-all ${
                 index === rateCardIndex ? 'w-5 bg-primary' : 'w-1.5 bg-ink-faint/35'
               }`}

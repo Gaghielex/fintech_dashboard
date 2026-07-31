@@ -12,8 +12,8 @@ function formatShortDate(date) {
 
 function Sparkline({ points, decimals, gradientId }) {
   const width = 320
-  const height = 132
-  const pad = { top: 8, right: 44, bottom: 24, left: 8 }
+  const height = 160
+  const pad = { top: 10, right: 44, bottom: 26, left: 8 }
   const series = points
     .map((p) => ({ date: p.date, value: Number(p.value) || 0 }))
     .filter((p) => p.date && p.value > 0)
@@ -25,71 +25,129 @@ function Sparkline({ points, decimals, gradientId }) {
   const chartRight = width - pad.right
   const chartTop = pad.top
   const chartBottom = height - pad.bottom
+  const plotW = chartRight - chartLeft
+  const plotH = chartBottom - chartTop
   const gridTicks = [0, 0.25, 0.5, 0.75, 1]
   const xTicks = series.length
     ? [0, Math.floor((series.length - 1) / 2), series.length - 1]
     : []
   const svgPoints = series.map((p, i) => {
-    const x = series.length <= 1 ? chartLeft : chartLeft + (i / (series.length - 1)) * (chartRight - chartLeft)
-    const y = chartBottom - ((p.value - min) / span) * (chartBottom - chartTop)
+    const x = series.length <= 1 ? chartLeft : chartLeft + (i / (series.length - 1)) * plotW
+    const y = chartBottom - ((p.value - min) / span) * plotH
     return `${x.toFixed(1)},${y.toFixed(1)}`
   })
 
+  const chartBoxClass = 'relative h-32 w-full shrink-0 md:h-52 lg:h-64'
+
   if (svgPoints.length < 2) {
-    return <div className="h-32 rounded-xl bg-surface-1/40" aria-hidden />
+    return <div className={`${chartBoxClass} rounded-xl bg-surface-1/40`} aria-hidden />
   }
 
   return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="h-32 w-full overflow-visible" aria-hidden>
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#00c896" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#00c896" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      {gridTicks.map((tick) => {
-        const y = chartBottom - tick * (chartBottom - chartTop)
-        const value = min + tick * span
-        return (
-          <g key={tick}>
+    <div className={chartBoxClass}>
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        className="absolute inset-0 h-full w-full overflow-visible"
+        aria-hidden
+      >
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#00c896" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#00c896" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {gridTicks.map((tick) => {
+          const y = chartBottom - tick * plotH
+          return (
             <line
+              key={tick}
               x1={chartLeft}
               y1={y}
               x2={chartRight}
               y2={y}
               stroke="rgba(139,148,158,0.13)"
               strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
             />
-            <text x={width - 2} y={y + 3} fill="#8b949e" fontSize="8" textAnchor="end">
-              {value.toFixed(decimals)}
-            </text>
-          </g>
-        )
-      })}
-      <line x1={chartLeft} y1={chartBottom} x2={chartRight} y2={chartBottom} stroke="rgba(139,148,158,0.30)" strokeWidth="1" />
-      {xTicks.map((index) => {
-        const x = series.length <= 1 ? chartLeft : chartLeft + (index / (series.length - 1)) * (chartRight - chartLeft)
-        const anchor = index === 0 ? 'start' : index === series.length - 1 ? 'end' : 'middle'
+          )
+        })}
+        <line
+          x1={chartLeft}
+          y1={chartBottom}
+          x2={chartRight}
+          y2={chartBottom}
+          stroke="rgba(139,148,158,0.30)"
+          strokeWidth="1"
+          vectorEffect="non-scaling-stroke"
+        />
+        <polyline
+          points={`${svgPoints[0]} ${svgPoints.join(' ')} ${svgPoints[svgPoints.length - 1].split(',')[0]},${chartBottom} ${svgPoints[0].split(',')[0]},${chartBottom}`}
+          fill={`url(#${gradientId})`}
+          stroke="none"
+        />
+        <polyline
+          points={svgPoints.join(' ')}
+          fill="none"
+          stroke="#00c896"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+
+      {gridTicks.map((tick) => {
+        const value = min + tick * span
+        const topPct = ((pad.top + (1 - tick) * plotH) / height) * 100
         return (
-          <text key={index} x={x} y={height - 5} fill="#8b949e" fontSize="8" textAnchor={anchor}>
-            {formatShortDate(series[index]?.date)}
-          </text>
+          <span
+            key={tick}
+            className="pointer-events-none absolute right-0 -translate-y-1/2 font-dm-mono text-[9px] tabular-nums leading-none text-ink-muted md:text-[10px]"
+            style={{ top: `${topPct}%` }}
+          >
+            {value.toFixed(decimals)}
+          </span>
         )
       })}
-      <polyline
-        points={`${svgPoints[0]} ${svgPoints.join(' ')} ${svgPoints[svgPoints.length - 1].split(',')[0]},${chartBottom} ${svgPoints[0].split(',')[0]},${chartBottom}`}
-        fill={`url(#${gradientId})`}
-        stroke="none"
-      />
-      <polyline
-        points={svgPoints.join(' ')}
-        fill="none"
-        stroke="#00c896"
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+
+      {xTicks.map((index) => {
+        const xPct =
+          series.length <= 1
+            ? (chartLeft / width) * 100
+            : ((chartLeft + (index / (series.length - 1)) * plotW) / width) * 100
+        if (index === 0) {
+          return (
+            <span
+              key={index}
+              className="pointer-events-none absolute bottom-0 left-0 font-dm-mono text-[9px] leading-none text-ink-muted md:text-[10px]"
+            >
+              {formatShortDate(series[index]?.date)}
+            </span>
+          )
+        }
+        if (index === series.length - 1) {
+          return (
+            <span
+              key={index}
+              className="pointer-events-none absolute bottom-0 font-dm-mono text-[9px] leading-none text-ink-muted md:text-[10px]"
+              style={{ right: `${(pad.right / width) * 100}%` }}
+            >
+              {formatShortDate(series[index]?.date)}
+            </span>
+          )
+        }
+        return (
+          <span
+            key={index}
+            className="pointer-events-none absolute bottom-0 -translate-x-1/2 font-dm-mono text-[9px] leading-none text-ink-muted md:text-[10px]"
+            style={{ left: `${xPct}%` }}
+          >
+            {formatShortDate(series[index]?.date)}
+          </span>
+        )
+      })}
+    </div>
   )
 }
 
@@ -203,7 +261,7 @@ export function RateContextCard({
 
   return (
     <section
-      className="min-h-[17rem] rounded-2xl border border-white/[0.08] p-4 backdrop-blur-xl"
+      className="flex h-full min-h-[17rem] flex-col rounded-2xl border border-white/[0.08] p-4 backdrop-blur-xl"
       style={{
         background:
           'linear-gradient(145deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.035) 42%, rgba(0,200,150,0.055) 100%), rgba(22,27,34,0.72)',
@@ -264,7 +322,7 @@ export function RateContextCard({
         {ratesReady ? displayStats.current.toFixed(decimals) : '—'}
       </p>
 
-      <div className="mt-3">
+      <div className="mt-3 shrink-0">
         <Sparkline
           points={displayPoints}
           decimals={decimals}
@@ -272,7 +330,9 @@ export function RateContextCard({
         />
       </div>
 
-      <p className={`font-dm-sans mt-3 rounded-xl border px-3 py-2 text-xs leading-snug ${signalClass}`}>
+      <p
+        className={`font-dm-sans mt-3 flex min-h-[2.75rem] items-center rounded-xl border px-3 py-2 text-xs leading-snug ${signalClass}`}
+      >
         {ratesReady ? guidance.label : 'Waiting for rate history...'}
       </p>
 
@@ -291,7 +351,7 @@ function RangeStat({ label, value }) {
       <p className="font-dm-sans text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
         {label}
       </p>
-      <p className="font-dm-mono mt-1 truncate text-xs font-semibold text-ink">
+      <p className="font-dm-mono mt-1 truncate text-xs font-semibold tabular-nums text-ink">
         {value}
       </p>
     </div>
