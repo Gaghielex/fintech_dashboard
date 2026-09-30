@@ -13,8 +13,12 @@ export function GoalCompletionDonut({ percent, accent = 'teal', size = 36 }) {
   const cx = size / 2
   const circumference = 2 * Math.PI * r
   const offset = circumference * (1 - pct / 100)
-  const isGold = String(accent).toLowerCase() === 'gold'
-  const ringClass = isGold ? 'text-accent-gold' : 'text-primary'
+  const ringClass = {
+    gold:   'text-accent-gold',
+    pink:   'text-accent-pink',
+    orange: 'text-accent-orange',
+    teal:   'text-primary',
+  }[String(accent).toLowerCase()] ?? 'text-primary'
 
   return (
     <div

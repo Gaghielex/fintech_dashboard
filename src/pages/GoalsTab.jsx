@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback, useRef } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
-import { computeGoalsLiquidAud, UP_SAVERS_ACCOUNT_ID, UP_SAVERS_GABS_ID } from '../utils/financeAggregate.js'
+import { computeGoalsLiquidAud, getUpSaverAccounts } from '../utils/financeAggregate.js'
 import { computeGoalsLiquidAllocation } from '../utils/goalProgress.js'
 import { getGoalsSheetEditUrl } from '../utils/goalsSheetUrl.js'
 import { GoalsLiquidStrip } from '../components/goals/GoalsLiquidStrip.jsx'
@@ -135,15 +135,16 @@ export function GoalsTab({
   sheetGids,
 }) {
   const [upSaversOnly, setUpSaversOnly] = useState(true)
-  const [upSaverSelection, setUpSaverSelection] = useState({ rmit: true, gabs: false })
+  const [upSaverSelection, setUpSaverSelection] = useState(/** @type {Record<string, boolean>} */ ({}))
+
+  const upSaverAccounts = useMemo(() => getUpSaverAccounts(accounts), [accounts])
 
   const upSaverIds = useMemo(() => {
     if (!upSaversOnly) return undefined
-    const ids = []
-    if (upSaverSelection.rmit) ids.push(UP_SAVERS_ACCOUNT_ID)
-    if (upSaverSelection.gabs) ids.push(UP_SAVERS_GABS_ID)
-    return ids
-  }, [upSaversOnly, upSaverSelection])
+    return upSaverAccounts
+      .filter((a) => upSaverSelection[a.id] !== false)
+      .map((a) => a.id)
+  }, [upSaversOnly, upSaverAccounts, upSaverSelection])
 
   const liquidAud = useMemo(
     () => computeGoalsLiquidAud(accounts, latestRates, { upSaversOnly, upSaverIds }),
@@ -203,9 +204,10 @@ export function GoalsTab({
         goals={goals}
         upSaversOnly={upSaversOnly}
         onUpSaversOnlyChange={setUpSaversOnly}
+        upSaverAccounts={upSaverAccounts}
         upSaverSelection={upSaverSelection}
-        onUpSaverSelectionChange={(key, value) =>
-          setUpSaverSelection((prev) => ({ ...prev, [key]: value }))
+        onUpSaverSelectionChange={(id, value) =>
+          setUpSaverSelection((prev) => ({ ...prev, [id]: value }))
         }
       />
 

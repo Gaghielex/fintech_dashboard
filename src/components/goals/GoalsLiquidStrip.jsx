@@ -8,8 +8,9 @@ import { computeGoalsStripStatus } from '../../utils/goalProgress.js'
  *   goals: import('../../types/sheetTypes.js').GoalRow[],
  *   upSaversOnly: boolean,
  *   onUpSaversOnlyChange: (value: boolean) => void,
- *   upSaverSelection: { rmit: boolean, gabs: boolean },
- *   onUpSaverSelectionChange: (key: 'rmit' | 'gabs', value: boolean) => void,
+ *   upSaverAccounts: import('../../types/sheetTypes.js').AccountRow[],
+ *   upSaverSelection: Record<string, boolean>,
+ *   onUpSaverSelectionChange: (id: string, value: boolean) => void,
  * }} props
  */
 export function GoalsLiquidStrip({
@@ -18,6 +19,7 @@ export function GoalsLiquidStrip({
   goals,
   upSaversOnly,
   onUpSaversOnlyChange,
+  upSaverAccounts,
   upSaverSelection,
   onUpSaverSelectionChange,
 }) {
@@ -25,9 +27,9 @@ export function GoalsLiquidStrip({
 
   const hint = (() => {
     if (!upSaversOnly) return 'AUD liquid across all accounts'
-    const selected = []
-    if (upSaverSelection.rmit) selected.push('2Up RMIT Saver 🎓')
-    if (upSaverSelection.gabs) selected.push('2Up Gabs Saver 🚀')
+    const selected = upSaverAccounts
+      .filter((a) => upSaverSelection[a.id] !== false)
+      .map((a) => a.account_name)
     if (selected.length === 0) return 'No Up savers selected'
     return selected.join(' + ')
   })()
@@ -67,18 +69,16 @@ export function GoalsLiquidStrip({
           <Toggle checked={upSaversOnly} onChange={onUpSaversOnlyChange} />
         </label>
 
-        {upSaversOnly && (
+        {upSaversOnly && upSaverAccounts.length > 0 && (
           <div className="border-t border-border/50 bg-surface-1/40 px-4 py-2.5 space-y-2.5">
-            <SubToggleRow
-              label="2Up RMIT Saver 🎓"
-              checked={upSaverSelection.rmit}
-              onChange={(v) => onUpSaverSelectionChange('rmit', v)}
-            />
-            <SubToggleRow
-              label="2Up Gabs Saver 🚀"
-              checked={upSaverSelection.gabs}
-              onChange={(v) => onUpSaverSelectionChange('gabs', v)}
-            />
+            {upSaverAccounts.map((a) => (
+              <SubToggleRow
+                key={a.id}
+                label={a.account_name}
+                checked={upSaverSelection[a.id] !== false}
+                onChange={(v) => onUpSaverSelectionChange(a.id, v)}
+              />
+            ))}
           </div>
         )}
       </div>

@@ -37,7 +37,7 @@
  */
 
 /**
- * @typedef {'teal' | 'gold'} GoalAccent
+ * @typedef {'teal' | 'gold' | 'pink' | 'orange'} GoalAccent
  */
 
 /**

@@ -31,9 +31,16 @@ export function isInNetWorth(a) {
   return Boolean(norm(a.type))
 }
 
-/** Sheet account ids for Up Bank savers sub-toggles. */
-export const UP_SAVERS_ACCOUNT_ID = 'au-up-02'
-export const UP_SAVERS_GABS_ID    = 'au-up-03'
+/**
+ * Returns all Up Bank active term_deposit accounts (used for Goals sub-toggles).
+ * @param {import('../types/sheetTypes.js').AccountRow[]} accounts
+ * @returns {import('../types/sheetTypes.js').AccountRow[]}
+ */
+export function getUpSaverAccounts(accounts) {
+  return accounts.filter(
+    (a) => norm(a.bank) === 'up bank' && norm(a.type) === 'term_deposit' && norm(a.status) === 'active',
+  )
+}
 
 /**
  * @param {import('../types/sheetTypes.js').AccountRow} a
@@ -91,10 +98,11 @@ function sumAud(accounts, rates, predicate) {
 export function computeGoalsLiquidAud(accounts, rates, opts = {}) {
   const r = rates ?? { JPY: 0, USD: 0 }
   if (opts.upSaversOnly) {
-    const ids = opts.upSaverIds ?? [UP_SAVERS_ACCOUNT_ID]
+    const ids = opts.upSaverIds ?? []
     if (ids.length === 0) return 0
     return ids.reduce((sum, id) => {
-      const acc = accounts.find((a) => norm(a.id) === id)
+      // Match by id AND term_deposit type to avoid duplicate IDs picking wrong row
+      const acc = accounts.find((a) => norm(a.id) === id && norm(a.type) === 'term_deposit')
       if (!acc) return sum
       return sum + convertToAud(Number(acc.balance) || 0, String(acc.currency), r)
     }, 0)

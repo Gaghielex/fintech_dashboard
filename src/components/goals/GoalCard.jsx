@@ -6,13 +6,18 @@ import {
 import { GoalCompletionDonut } from './GoalCompletionDonut.jsx'
 import { InstitutionLogo } from '../InstitutionLogo.jsx'
 
+const ACCENT_ICON_CLS = {
+  gold:   'bg-accent-gold/20 text-accent-gold',
+  pink:   'bg-accent-pink/20 text-accent-pink',
+  orange: 'bg-accent-orange/20 text-accent-orange',
+  teal:   'bg-primary/15 text-primary',
+}
+
 function GoalIcon({ accent }) {
-  const isGold = accent === 'gold'
+  const cls = ACCENT_ICON_CLS[accent] ?? ACCENT_ICON_CLS.teal
   return (
     <span
-      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
-        isGold ? 'bg-accent-gold/20 text-accent-gold' : 'bg-primary/15 text-primary'
-      }`}
+      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${cls}`}
       aria-hidden
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -64,10 +69,18 @@ export function GoalCard({ goal, allocatedAud, ratesReady, dragHandle }) {
   const now = new Date()
   const m = computeGoalMetrics(goal, allocatedAud, now)
   const accent = String(goal.accent || 'teal').toLowerCase()
-  const fillClass =
-    accent === 'gold' ? 'bg-accent-gold/90' : 'bg-primary/90'
-  const amountClass =
-    accent === 'gold' ? 'text-accent-gold' : 'text-primary'
+  const fillClass = {
+    gold:   'bg-accent-gold/90',
+    pink:   'bg-accent-pink/90',
+    orange: 'bg-accent-orange/90',
+    teal:   'bg-primary/90',
+  }[accent] ?? 'bg-primary/90'
+  const amountClass = {
+    gold:   'text-accent-gold',
+    pink:   'text-accent-pink',
+    orange: 'text-accent-orange',
+    teal:   'text-primary',
+  }[accent] ?? 'text-primary'
 
   const timeBarPct = m.validWindow ? m.timeElapsedPct * 100 : 0
 
